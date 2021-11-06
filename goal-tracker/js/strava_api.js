@@ -61,7 +61,7 @@ function updateAthleteInfo(data){
     document.getElementById("profile_picture").src = data['profile_medium'];
 }
 
-function getActivities(){
+function getActivities() {
 
     document.getElementById("loader").style.display = 'block';
     
@@ -69,21 +69,26 @@ function getActivities(){
     fetch(activities_link)
     .then(response => response.json())
     .then((json) => {
-        runData = json;
+        activityData = json;
         
         // compute year and filter to 2021
-        runData.forEach(function(d){ d.year = d.start_date.slice(0,4); })
-        runData = runData.filter(function(d){ return d.year == "2021" });
+        activityData.forEach(function(d){ d.year = d.start_date.slice(0,4); })
 
-        console.log(runData);
-        lineplot(runData);
+        console.log(activityData);
+
+        renderDashboard(activityData);
     })
+}
+
+function renderDashboard(activityData) {
+    const activityDataThisYear = activityData.filter(function(d){ return d.year == new Date().getFullYear().toString() });
+    lineplot(activityDataThisYear);
 }
 
 // for local development
 d3.json("data.json", function(error, data) {
     console.log(data); // this is your data
-    lineplot(data);
+    renderDashboard(data);
 });
 
 ///////////////////////////////////// API token setting up ///////////////////////////////////////////////////

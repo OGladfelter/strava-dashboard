@@ -25,10 +25,8 @@ body {
     clear: both;
 }
 
-h3{
-    text-align: center;
-    margin: auto;
-    font-size: 25px;
+h2 {
+    font-size: 30px;
 }
 
 img{
@@ -120,6 +118,9 @@ span.bylineSpan{
     border-radius: 5px;
     box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
 }
+.sliderDiv:hover{
+    background-color: #8ffcfc;
+}
 
 .label{
     font-weight: bold;
@@ -155,16 +156,22 @@ span.bylineSpan{
     color: black;
 }
 
-.annotation{
+.annotation {
     cursor: pointer;
     font-size: 16px;
 }
-.annotation rect{
+.annotation text {
+    pointer-events: none;
+}
+.annotation rect {
     fill: #b1ffff;
     rx: 10;
     ry: 10;
     stroke-width: 1px;
     stroke: black;
+}
+.annotation rect:hover{
+    fill: #8ffcfc;
 }
 
 .intro{
@@ -217,10 +224,10 @@ button{
     padding: 5px; 
     font-size: 14px;
     cursor: pointer;
-    background-color: white;
+    background-color: #b1ffff;
 }
 button:hover{
-    background-color: #b1ffff;
+    background-color: #8ffcfc;
 }
 
 #slider {

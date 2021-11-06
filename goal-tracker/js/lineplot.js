@@ -3,14 +3,12 @@ const annual_mileage_goal = 1400; // how many miles I want(ed) to run in this(pa
 
 function lineplot(data) {
 
-    console.log(document.getElementById("lineplot").offsetWidth);
-
     // set the dimensions and margins of the graph on mobile
     if (screen.width < 600){
         // dimensions
         var height = window.innerHeight * .8;
         var width = window.innerWidth * .95;
-        var margin = {top: 0, right: 50, bottom: 50, left: 50};
+        var margin = {top: 20, right: 50, bottom: 50, left: 50};
         var width = width - margin.left - margin.right;
         var height = height - margin.top - margin.bottom;
 
@@ -20,7 +18,7 @@ function lineplot(data) {
         // dimensions
         var height = window.innerHeight * .8;
         var width = document.getElementById("lineplot").offsetWidth * .9;
-        var margin = {top: 0, right: 50, bottom: 50, left: 50};
+        var margin = {top: 30, right: 50, bottom: 50, left: 50};
         var width = width - margin.left - margin.right;
         var height = height - margin.top - margin.bottom;
 
@@ -39,7 +37,7 @@ function lineplot(data) {
     var rides = data.filter(function(d){ return (d.type == "Ride") | (d.type == "Indoor Cycling") | (d.type == "E-Bike Ride") | (d.type == "Virtual Ride") });
 
     // if either have a length of 0, disable the swap button
-    if (rides.length == 0 | runs.length == 0){
+    if (rides.length == 0 | runs.length == 0) {
         document.getElementById("swapData").disabled = true;
     };
 
@@ -312,7 +310,7 @@ function lineplot(data) {
     annotations.select("rect").attr("width", annotationsWidth).attr("height", annotationsHeight);
 
     // move annotations box to bottom right corner of graph (with some breathing room)
-    annotations.attr("transform", "translate(" + (x(data[data.length-1].date) - annotationsWidth - 50) + "," + (y(0) - annotationsHeight - 50) + ")");
+    annotations.attr("transform", "translate(" + 10 + "," + 40 + ")");
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -343,7 +341,7 @@ function lineplot(data) {
     };
 
     function updateGoal(newGoal){
-
+        
         // recompute and overwrite pace column
         data.forEach(function(d, i){
             d.pace = (newGoal / 365) * (d.day_of_year);
@@ -442,13 +440,13 @@ function lineplot(data) {
 
     // for switching between rides and rides:
     d3.select("#swapData").on("click", function(){
-        if (this.innerHTML == "See Rides"){
+        if (this.innerHTML == "Switch to rides"){
             updateGraph(rides);
-            this.innerHTML = "See Runs";
+            this.innerHTML = "Switch to runs";
         }
-        else if (this.innerHTML == "See Runs"){
+        else if (this.innerHTML == "Switch to runs"){
             updateGraph(runs);
-            this.innerHTML = "See Rides";
+            this.innerHTML = "Switch to rides";
         }
     })
     
@@ -608,9 +606,6 @@ function lineplot(data) {
     
             // everything up to cursor is orange, and gray on other side
             this.style.background = `linear-gradient(to right, #ffab00, #ffab00 ${(this.value-this.min)/(this.max-this.min)*100}%, #c6c6c6 ${(this.value-this.min)/(this.max-this.min)*100}%, #c6c6c6 100%)`
-    
-            // update title
-            //document.getElementById("title").innerHTML = "The Path To " + d3.format(",")(slider.value) + " Miles In 2021";
             
             // update slider label
             sliderLabel.innerHTML = d3.format(",")(slider.value);
