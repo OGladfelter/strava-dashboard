@@ -1,0 +1,288 @@
+body {
+    font-family: sans-serif;
+    color: black;
+    background-color: whitesmoke;
+    text-align: center;
+    margin: 0;
+}
+
+h3{
+    text-align: center;
+    margin: auto;
+    font-size: 25px;
+}
+
+img{
+    padding-left: 10px;
+    padding-top: 10px;
+}
+
+a:link { color: #141DFF; text-decoration: none;}
+a:visited{ color: #141DFF; }
+a:hover {color: black; text-decoration: none;}
+
+/* The navigation bar */
+.navbar {
+    overflow: hidden;
+    background-color: white;
+    top: 0; /* Position the navbar at the top of the page */
+    width: 100%; /* Full width */
+    border-style: solid;
+    border-width: 0px;
+    border-bottom-width: 2px;
+    border-bottom-color: black;
+}
+
+/* Links inside the navbar */
+.navbar a {
+    display: block;
+    color: #0e005e;
+    text-align: center;
+    padding: 5px;
+    text-decoration: none;
+    font-size: 25px;
+    font-weight: bold;
+    font-family: "helvetica", "open sans"; 
+}
+  
+/* Change background on mouse-over */
+.navbar a:hover {
+    background: #ffab00;
+    color: #0e005e;
+}
+
+p { font-size: 18px;}
+span { font-size: 18px;}
+span.bylineSpan{
+    font-size: 18px;
+}
+
+.mileage_line {
+    fill: none;
+    stroke: #ffab00;
+    stroke-width: 3;
+}
+
+.pace_line {
+    fill: none;
+    stroke: #585858;
+    stroke-width: 1.5;
+    stroke-dasharray: 10;
+    /* opacity: 0.75; */
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 14px;
+    fill: #222;
+}
+
+.dot{
+    stroke: black;
+    fill: #ffab00;
+    r: 6;
+    /* opacity: 0; */
+}
+
+.sliderDiv{
+    background-color: #b1ffff;
+    display: inline-block;
+    color: black;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 10px;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    visibility: hidden;
+}
+
+.label{
+    font-weight: bold;
+    text-anchor: middle;
+    alignment-baseline: middle;
+    pointer-events: none;
+}
+
+.hoverLineHorizontal {
+    stroke: #0e005e;
+    stroke-width: 2px;
+    stroke-dasharray: 3,3;
+    pointer-events: none;
+}
+.hoverLineVerical {
+    stroke: #0e005e;
+    stroke-width: 2px;
+    stroke-dasharray: 3,3;
+    pointer-events: none;
+}
+
+.tooltip {
+    position: absolute;
+    min-width: 80px;
+    height: auto;
+    background: none repeat scroll 0 0 #fafafa;
+    border: 1px solid black;
+    padding: 10px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    pointer-events: none;
+    color: black;
+}
+
+.annotation{
+    cursor: pointer;
+    font-size: 16px;
+}
+.annotation rect{
+    fill: #b1ffff;
+    rx: 10;
+    ry: 10;
+    stroke-width: 1px;
+    stroke: black;
+}
+
+.intro{
+    width:35%; 
+    margin:auto;
+}
+
+@media screen and (max-width: 600px) {
+    /* hide annotations bubble if they're on mobile */
+    .annotation{
+        visibility: hidden;
+    }
+
+    /* hide y axis label if they're on mobile */
+    .yAxisLabel{
+        visibility: hidden;
+    }
+
+    .sliderDiv{
+        margin-bottom: 25px;
+    }
+
+    h1{
+        width: 90%;
+    }
+
+    .intro{
+        width: 90%;
+    }
+
+    img{
+        padding-bottom: 5px;
+    }
+}
+
+
+button{
+    display: block;
+    font-family: sans-serif;
+    border-radius: 5px;
+    border-width: 1.5px;
+    box-shadow: none;
+    padding: 5px; 
+    font-size: 14px;
+    cursor: pointer;
+    background-color: white;
+}
+button:hover{
+    background-color: #b1ffff;
+}
+
+#slider {
+    border-radius: 8px;
+    height: 10px;
+    width: 100%;
+    outline: black;
+    -webkit-appearance: none;
+}
+  
+input[type='range']::-webkit-slider-thumb {
+    width: 17px;
+    -webkit-appearance: none;
+    height: 17px;
+    background: white;
+    border: 1px solid black;
+    border-radius: 7px;
+}
+
+fieldset{
+    display: inline-block;
+    width: 50%;
+    text-align: center;
+    margin: auto;
+    background-color: whitesmoke; 
+    background-image: radial-gradient(circle, whitesmoke 85%, #b1ffff);
+    border-radius: 10px;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+}
+legend{
+    font-weight: bold;
+    font-size: 18px;
+}
+article{
+    margin: auto;
+    width: 60%;
+    text-align: left;
+    display: inline-block;
+}
+textarea{
+    display: inline-block;
+    margin: auto;
+    min-width: 100px;
+    max-width: 250px;
+    font-size: 14px;
+}
+.dataEditorError{
+    font-size: 14px;
+    color: red;
+    font-style: italic;
+    display: none;
+}
+.buttonsDiv{
+    float: right;
+    display: inline;
+}
+button{
+    display: inline;
+    font-weight: bold;
+    font-size: 15px;
+    padding: 10px;
+}
+button:hover a{
+    color: black;
+}
+
+iframe{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#chart{
+    text-align: center;
+    margin: auto;
+}
+
+.loader {
+    border: 16px solid lightgray; /* Light grey */
+    border-top: 16px solid #0e005e; /* Blue */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 2s linear infinite;
+    margin: auto;
+    display: none;
+}
+  
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

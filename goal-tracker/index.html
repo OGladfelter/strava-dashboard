@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-146824308-1"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-146824308-1');
+    </script>
+            
+    <meta charset="utf-8">
+    <title>Your 2021 Mileage</title>
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon/favicon-16x16.png">
+    <link rel="manifest" href="../favicon/site.webmanifest">
+
+    <!-- Facebook Opengraph -->
+    <meta property="og:url" content="http://cultureplot.com/mileage-goal-custom/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Your 2021 Mileage" />
+    <meta property="og:description" content="Connect To Strava To Visualize Your Mileage"/>
+
+    <meta property="og:image" content="https://cultureplot.com/img/strava_lineplot_preview.png" />
+    <meta property="og:image:alt" content="Lineplot of Strava running data" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://cultureplot.com/img/strava_lineplot_preview.png" />
+    <meta name="twitter:image:alt" content="Lineplot of Strava activity data" />
+    <meta name="twitter:description" content="SConnect To Strava To Visualize Your Mileage"/>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<html>
+<body>
+
+
+<body>
+    <!-- banner -->
+    <div class="navbar">
+        <a href="https://cultureplot.com">Cultureplot</a>
+    </div>
+    
+    <h1 id="title">Your 2021 Mileage</h1>
+    <span class="bylineSpan">By <a href="https://cultureplot.com/about/" target="_blank">Oliver Gladfelter</a></span><span class="bylineSpan" style="color:gray;"></span>
+
+    <div class="intro">
+        <p style="text-align:left;">Click the below button to log into Strava and authorize a data connection with cultureplot.com. Strava will then send your recent activities to this page, which will create your personalized mileage chart. None of your data or information is saved.</p>
+        <!-- <button><a href="https://www.strava.com/oauth/authorize?client_id=47842&response_type=code&redirect_uri=http://127.0.0.1:5500/index.html&approval_prompt=auto&scope=read_all,activity:read_all">Login</a></button>  -->
+        <button><a href="https://www.strava.com/oauth/authorize?client_id=47842&response_type=code&redirect_uri=https://cultureplot.com/mileage-goal-custom/index.html&approval_prompt=auto&scope=read_all,activity:read_all">Strava Login</a></button> 
+        <button id="swapData" style="display:none;">See Rides</button>
+    </div>
+    
+    <div style="display:inline-flex;">
+        <h3 id="name"></h3>
+        <img src="" id="profile_picture">
+    </div>
+
+    <div class="loader" id="loader"></div>
+    
+    <div id="lineplot"></div>
+    
+    
+    
+    <!-- this gets moved up to the top of the viz div -->
+    <div id="sliderDiv" class="sliderDiv">
+        <p style="margin: 0; margin-bottom: 5px;">Mileage Goal: <span id="sliderLabel"></span></p>
+        <input type="range" min="500" max="3000" value="1400" step="50" class="range-slider grad" id="slider">
+    </div>
+
+    <script src="js/strava_api.js"></script>
+    <script src="js/lineplot.js"></script>
+    <!-- <script src="js/chart.js"></script> -->
+
+</body>
+</html>
