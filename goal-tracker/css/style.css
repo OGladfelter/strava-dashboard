@@ -6,6 +6,25 @@ body {
     margin: 0;
 }
 
+* {
+    box-sizing: border-box;
+}
+.column {
+    float: left;
+    padding: 10px;
+}
+.left {
+    width: 25%;
+}
+.right {
+    width: 75%;
+}
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
 h3{
     text-align: center;
     margin: auto;
@@ -87,19 +106,19 @@ span.bylineSpan{
 .dot{
     stroke: black;
     fill: #ffab00;
-    r: 6;
-    /* opacity: 0; */
+    r: 5;
 }
 
 .sliderDiv{
     background-color: #b1ffff;
-    display: inline-block;
+    display: block;
+    width: 75%;
+    margin: auto;
     color: black;
     padding: 10px;
     border: 1px solid black;
-    border-radius: 10px;
+    border-radius: 5px;
     box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
-    visibility: hidden;
 }
 
 .label{
@@ -154,6 +173,13 @@ span.bylineSpan{
 }
 
 @media screen and (max-width: 600px) {
+    .left {
+        width: 100%;
+    }
+    .right {
+        width: 100%;
+    }
+
     /* hide annotations bubble if they're on mobile */
     .annotation{
         visibility: hidden;

@@ -80,17 +80,22 @@ function getActivities(){
     })
 }
 
+// for local development
+d3.json("data.json", function(error, data) {
+    console.log(data); // this is your data
+    lineplot(data);
+});
 
 ///////////////////////////////////// API token setting up ///////////////////////////////////////////////////
 // check for URL params
 var queryString = window.location.search;
 
 // search local storage for a possible access token
-try{
+try {
     var token_exists = JSON.parse(localStorage.getItem("strava_data")).access_token != null;
     var expires_at = JSON.parse(localStorage.getItem("strava_data")).expires_at;
 }
-catch{
+catch {
     var token_exists = false;
     var expires_at = 0;
 }

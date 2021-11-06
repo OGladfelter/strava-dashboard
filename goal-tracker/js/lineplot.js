@@ -1,14 +1,16 @@
 // parameters
 const annual_mileage_goal = 1400; // how many miles I want(ed) to run in this(past) year
 
-function lineplot(data){
+function lineplot(data) {
+
+    console.log(document.getElementById("lineplot").offsetWidth);
 
     // set the dimensions and margins of the graph on mobile
     if (screen.width < 600){
         // dimensions
-        var height = window.innerHeight * .9;
+        var height = window.innerHeight * .8;
         var width = window.innerWidth * .95;
-        var margin = {top: 0, right: 25, bottom: 50, left: 30};
+        var margin = {top: 0, right: 50, bottom: 50, left: 50};
         var width = width - margin.left - margin.right;
         var height = height - margin.top - margin.bottom;
 
@@ -16,8 +18,8 @@ function lineplot(data){
     }
     else{ // on larger device
         // dimensions
-        var height = window.innerHeight * .9;
-        var width = window.innerWidth * .9;
+        var height = window.innerHeight * .8;
+        var width = document.getElementById("lineplot").offsetWidth * .9;
         var margin = {top: 0, right: 50, bottom: 50, left: 50};
         var width = width - margin.left - margin.right;
         var height = height - margin.top - margin.bottom;
@@ -96,25 +98,23 @@ function lineplot(data){
     // so what's the default gon' be?
     if (runs.length >= rides.length){
         data = runs;
-        document.getElementById("swapData").innerHTML = "See Rides";
+        document.getElementById("swapData").innerHTML = "Switch to rides";
     }
     else if (runs.length < rides.length){
         data = rides;
-        document.getElementById("swapData").innerHTML = "See Runs";
+        document.getElementById("swapData").innerHTML = "Switch to runs";
     }
 
     // display the button
-    document.getElementById("swapData").style.display = "inline";
+    document.getElementById("swapData").style.display = "block";
     
     // control how many labels are shown: lower number = more labels. Ex: 2 = label every other day, 10 = every other 10 days
-    // we want to show every other (# of weeks / 2) 
-    var label_freq = Math.floor(data.length / 14) + 1;
-
-    // never label every point on mobile
-    if (screen.width < 600 & label_freq == 1){
-        label_freq = 2;
+    // label more on larger screen, less on small screen
+    if (screen.width < 600){
+        var label_freq = Math.floor(data.length / 7) + 1;
+    } else {
+        var label_freq = Math.floor(data.length / 14) + 1;
     }
-
 
     ////////////// the viz ///////////////
     svg = d3.select('#lineplot').append("svg")
@@ -146,11 +146,11 @@ function lineplot(data){
     yAxis = svg.append("g").attr("class", "axis").attr("id", "y_axis").call(d3.axisLeft(y));
 
     svg.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 0 - margin.left)
-      .attr("x",0 - (height / 2))
+      //.attr("transform", "rotate(-90)")
+      .attr("y", 5)
+      .attr("x", 10)
       .attr("dy", "1em")
-      .style("text-anchor", "middle")
+      .style("text-anchor", "start")
       .style("fill", "#222")
       .attr("class", "yAxisLabel")
       .text("Cumulative Mileage"); 
@@ -318,32 +318,15 @@ function lineplot(data){
 
     //////////////////////////// slider to change mileage goal /////////////////////////////////////////////////////////
 
-    if (screen.width > 600){
-        // figure out where slider div is on page so we can move it to (0,0) 
-        var sliderDivBBox = document.getElementById("sliderDiv").getBoundingClientRect();
-        var sliderDiv_x_offset = sliderDivBBox.left + window.scrollX;
-        var sliderDiv_y_offset = sliderDivBBox.top + window.scrollY;
-
-        // get positions for top of y_axis (closest point to top left of graph)
-        var yAxisBBox = document.getElementById("y_axis").getBoundingClientRect();
-        var yAxisLeftPoint = yAxisBBox.left + window.scrollX;
-        var yAxisTopPoint = yAxisBBox.top + window.scrollY;
-
-        // move slider div from bottom of page to top left of graph (with 5% height and weight margins for breathing room)
-        // first by translating to 0,0 position on page, then to bottom right of y-axis top point
-        document.getElementById("sliderDiv").style.transform = "translate(" + (-sliderDiv_x_offset + yAxisLeftPoint + (width * .05)) + "px," + (-sliderDiv_y_offset + yAxisTopPoint + (height * .05)) + "px)";
-    }
-
     var slider = document.getElementById("slider");
     slider.value = annual_mileage_goal; // sets slider value to match parameter set at top of this file
     var sliderLabel = document.getElementById("sliderLabel");
-    sliderLabel.innerHTML = d3.format(",")(slider.value);
 
     const min = slider.min
     const max = slider.max
     const value = slider.value
 
-    // everything up to cursor is orange, and gray on other side
+    // the bar up to slider value is orange, and gray on other side
     slider.style.background = `linear-gradient(to right, #ffab00, #ffab00 ${(value-min)/(max-min)*100}%, #c6c6c6 ${(value-min)/(max-min)*100}%, #c6c6c6 100%)`
 
     // slider change function
@@ -351,9 +334,6 @@ function lineplot(data){
 
         // everything up to cursor is orange, and gray on other side
         this.style.background = `linear-gradient(to right, #ffab00, #ffab00 ${(this.value-this.min)/(this.max-this.min)*100}%, #c6c6c6 ${(this.value-this.min)/(this.max-this.min)*100}%, #c6c6c6 100%)`
-
-        // update title
-        //document.getElementById("title").innerHTML = "The Path To " + d3.format(",")(slider.value) + " Miles In 2021";
 
         // update slider label
         sliderLabel.innerHTML = d3.format(",")(slider.value);
@@ -416,7 +396,7 @@ function lineplot(data){
         // move tooltip
         tooltip
             .style("visibility", "visible")
-            .html("<b>" + dateToString(d.date) + "</b>: " + d.miles.toFixed(0) + " Miles<br>Year to Date: " + d.mileage.toFixed(0) + "<br>" + paceEval +  aheadBehind + " pace")
+            .html("<b>" + dateToString(d.date) + "</b>: " + d.miles.toFixed(1) + " Miles<br>Year to Date: " + d.mileage.toFixed(0) + "<br>" + paceEval +  aheadBehind + " pace")
             .transition().duration(250)
             .style("left", function(){
 
@@ -504,7 +484,7 @@ function lineplot(data){
             // move tooltip
             tooltip
                 .style("visibility", "visible")
-                .html("<b>" + dateToString(d.date) + "</b>: " + d.miles.toFixed(0) + " Miles<br>Year to Date: " + d.mileage.toFixed(0) + "<br>" + paceEval +  aheadBehind + " pace")
+                .html("<b>" + dateToString(d.date) + "</b>: " + d.miles.toFixed(1) + " Miles<br>Year to Date: " + d.mileage.toFixed(0) + "<br>" + paceEval +  aheadBehind + " pace")
                 .transition().duration(250)
                 .style("left", function(){
     
@@ -671,5 +651,4 @@ function lineplot(data){
             d3.select("#paceEvalText").text(paceEval.toFixed(0) + " miles " + aheadBehind + " goal pace");
         }
     }
-
 }
