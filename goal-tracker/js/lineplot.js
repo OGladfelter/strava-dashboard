@@ -1,31 +1,20 @@
 // parameters
-const annual_mileage_goal = 1400; // how many miles I want(ed) to run in this(past) year
+const annual_mileage_goal = document.getElementById("slider").value; // how many miles I want(ed) to run in this(past) year
 
 function lineplot(data) {
 
-    // set the dimensions and margins of the graph on mobile
-    if (screen.width < 600){
-        // dimensions
-        var height = window.innerHeight * .8;
-        var width = window.innerWidth * .95;
+    if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};
-        var width = width - margin.left - margin.right;
-        var height = height - margin.top - margin.bottom;
-
+        var height = window.innerHeight * .8 - margin.left - margin.right;
+        var width = window.innerWidth * .95 - margin.top - margin.bottom;
         var numTicks = 3;
     }
-    else{ // on larger device
-        // dimensions
-        var height = window.innerHeight * .8;
-        var width = document.getElementById("lineplot").offsetWidth * .9;
+    else { // larger device
         var margin = {top: 30, right: 50, bottom: 50, left: 50};
-        var width = width - margin.left - margin.right;
-        var height = height - margin.top - margin.bottom;
-
+        var height = window.innerHeight * .8 - margin.top - margin.bottom;
+        var width = document.getElementById("lineplot").offsetWidth * .9 - margin.left - margin.right;
         var numTicks = 8;
     }
-
-    document.getElementById("loader").style.display = 'none';
 
     //////////////////////////// data prep /////////////////////////
     
@@ -45,10 +34,7 @@ function lineplot(data) {
 
     // runs dataset - compute needed vars
     var total_miles = 0;
-    runs.forEach(function(d, i){
-        
-        // convert km to miles
-        d.miles = +d.distance / 1609.34;
+    runs.forEach(function(d){
 
         // parse strings into date object or numbers
         d.date = parseDate(d.start_date.split("T")[0]);

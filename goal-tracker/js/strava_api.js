@@ -71,23 +71,25 @@ function getActivities() {
     .then((json) => {
         activityData = json;
         
-        // compute year and filter to 2021
-        activityData.forEach(function(d){ d.year = d.start_date.slice(0,4); })
-
-        console.log(activityData);
+        // some data prep
+        activityData.forEach(function(d){ 
+            d.year = d.start_date.slice(0,4);
+            d.miles = +d.distance / 1609.34; 
+        })
 
         renderDashboard(activityData);
     })
 }
 
 function renderDashboard(activityData) {
-    const activityDataThisYear = activityData.filter(function(d){ return d.year == new Date().getFullYear().toString() });
+    mileagePlot(JSON.parse(JSON.stringify(activityData)));
+    const activityDataThisYear = JSON.parse(JSON.stringify(activityData.filter(function(d){ return d.year == new Date().getFullYear().toString() })));
     lineplot(activityDataThisYear);
+    document.getElementById("loader").style.display = 'none';
 }
 
 // for local development
 d3.json("data.json", function(error, data) {
-    console.log(data); // this is your data
     renderDashboard(data);
 });
 
