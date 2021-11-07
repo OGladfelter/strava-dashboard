@@ -119,7 +119,11 @@ function getActivities(pageNum){
             strava_data.forEach(function(d){ 
                 d.year = d.start_date.slice(0,4);
                 d.miles = +d.distance / 1609.34; 
-            })
+            });
+
+            // sort data by date in chronological order here - using id, as every subsequent activity has a higher ID
+            //strava_data = strava_data.sort(function (a,b) {return d3.ascending(a.id, b.id); });
+            strava_data = strava_data.reverse(); // reverse data since it came through in reverse-chronoligcal order
 
             console.log(strava_data);
 
@@ -134,6 +138,13 @@ function updateAthleteInfo(data){
 }
 
 function renderDashboard(activityData) {
+    // add tooltip
+    tooltip = d3.select("body")
+      .append("div")
+      .style('visibility', 'hidden')
+      .attr('class', 'tooltip')
+      .style("pointer-events", "none");
+      
     mileagePlot(JSON.parse(JSON.stringify(activityData)));
     const activityDataThisYear = JSON.parse(JSON.stringify(activityData.filter(function(d){ return d.year == new Date().getFullYear().toString() })));
     lineplot(activityDataThisYear);
@@ -142,5 +153,6 @@ function renderDashboard(activityData) {
 
 // for local development
 d3.json("data.json", function(error, data) {
+    data = data.reverse();
     renderDashboard(data);
 });
