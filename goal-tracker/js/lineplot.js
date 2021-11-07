@@ -18,9 +18,6 @@ function lineplot(data) {
 
     //////////////////////////// data prep /////////////////////////
     
-    // sort data by date in chronological order here?? Using id
-    data = data.sort(function (a,b) {return d3.ascending(a.id, b.id); });
-    
     // filter the data to just one type
     var runs = data.filter(function(d){ return d.type == "Run" });
     var rides = data.filter(function(d){ return (d.type == "Ride") | (d.type == "Indoor Cycling") | (d.type == "E-Bike Ride") | (d.type == "Virtual Ride") });
@@ -114,8 +111,8 @@ function lineplot(data) {
     const maxPace = d3.max(data, d => d.pace);
 
     // set the ranges
-    x = d3.scaleTime().range([0, width]).domain(d3.extent(data, function(d) { return d.date; }));
-    y = d3.scaleLinear().range([height, 0]).domain([0,d3.max([maxMileage, maxPace])]);
+    var x = d3.scaleTime().range([0, width]).domain(d3.extent(data, function(d) { return d.date; }));
+    var y = d3.scaleLinear().range([height, 0]).domain([0,d3.max([maxMileage, maxPace])]);
 
     // add axes
     var xAxis = d3.axisBottom(x).ticks(numTicks).tickFormat(d3.timeFormat("%b %d"));
@@ -140,7 +137,7 @@ function lineplot(data) {
       .text("Cumulative Mileage"); 
 
     // compute line function
-    mileageLine = d3.line()
+    var mileageLine = d3.line()
         .x(function(d) { return x(d.date); })
         .y(function(d) { return y(d.mileage);  })
         .curve(d3.curveStepAfter);
@@ -149,6 +146,7 @@ function lineplot(data) {
     svg.append("path")
         .data([data]) 
         .attr("class", "mileage_line")  
+        .attr("id", "mileage_line")
         .attr("d", mileageLine); 
 
     // draw straight line from first pace and date to final pace and date
@@ -343,8 +341,8 @@ function lineplot(data) {
         document.getElementById("pace_line").y2.baseVal.value = y(newGoalPaceToday);
 
         // update mileage line
-        mileageLine.y(function(d) { return y(d.mileage); });
-        d3.select(".mileage_line").transition().attr("d", mileageLine); 
+        mileageLine.x(function(d) { return x(d.date); }).y(function(d) { return y(d.mileage); });
+        d3.select("#mileage_line").transition().attr("d", mileageLine); 
 
         // move labels to stay with line
         svg.selectAll(".label").attr("y", function(d) { return y(d.mileage) }).call(getTextBox);
@@ -438,10 +436,10 @@ function lineplot(data) {
     
     // for if they switch between runs and rides:
     function updateGraph(data){
-    
-        // update ranges
-        y.domain([0,d3.max([data[data.length-1].mileage, data[data.length-1].pace])]);
-        x.domain(d3.extent(data, function(d) { return d.date; }));
+            
+        // update scale functions
+        var x = d3.scaleTime().range([0, width]).domain(d3.extent(data, function(d) { return d.date; }));
+        var y = d3.scaleLinear().range([height, 0]).domain([0,d3.max([data[data.length-1].mileage, data[data.length-1].pace])]);
     
         // update axes
         var xAxis = d3.axisBottom(x).ticks(numTicks).tickFormat(d3.timeFormat("%b %d"));
@@ -449,8 +447,13 @@ function lineplot(data) {
         d3.select("#y_axis").call(d3.axisLeft(y));
         
         // compute line function
-        mileageLine.y(function(d) { return y(d.mileage); });
-        d3.select(".mileage_line").data([data]).transition().attr("d", mileageLine);
+        //mileageLine.y(function(d) { return y(d.mileage); });
+        // compute line function
+        mileageLine
+            .x(function(d) { return x(d.date); })
+            .y(function(d) { return y(d.mileage);  });
+
+        d3.select("#mileage_line").data([data]).transition().attr("d", mileageLine);
     
         // move pace line
         document.getElementById("pace_line").y2.baseVal.value = y(data[data.length-1].pace);
@@ -618,7 +621,7 @@ function lineplot(data) {
     
             // update mileage line
             mileageLine.y(function(d) { return y(d.mileage); });
-            d3.select(".mileage_line").transition().attr("d", mileageLine); 
+            d3.select("#mileage_line").transition().attr("d", mileageLine); 
     
             // move labels to stay with line
             svg.selectAll(".label").attr("y", function(d) { return y(d.mileage) }).call(getTextBox);

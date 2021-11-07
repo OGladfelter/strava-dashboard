@@ -66,12 +66,12 @@ function mileagePlot(activitiesData) {
 	});
     svg.append("g")
             .attr("class", "axis")
-            .attr("id", "x_axis")
+            //.attr("id", "x_axis")
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis);
 
     //  Add the Y Axis
-    yAxis = svg.append("g").attr("class", "axis").attr("id", "y_axis").call(d3.axisLeft(y));
+    yAxis = svg.append("g").attr("class", "axis").call(d3.axisLeft(y));
     svg.append("text")
       .attr("y", 5)
       .attr("x", 10)
