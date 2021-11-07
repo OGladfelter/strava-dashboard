@@ -99,7 +99,7 @@ function mileagePlot(activitiesData) {
     var mileageLine = d3.line()
         .x(function(d) { return x(d.index); })
         .y(function(d) { return y(d.value);  })
-        .curve(d3.curveNatural);
+        .curve(d3.curveCatmullRom);
 
     // draw mileage line
     svg.append("path")
