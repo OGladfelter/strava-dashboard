@@ -115,7 +115,7 @@ function lineplot(data) {
     var y = d3.scaleLinear().range([height, 0]).domain([0,d3.max([maxMileage, maxPace])]);
 
     // add axes
-    var xAxis = d3.axisBottom(x).ticks(numTicks).tickFormat(d3.timeFormat("%b %d"));
+    var xAxis = d3.axisBottom(x).ticks(numTicks).tickSizeOuter(0).tickFormat(d3.timeFormat("%b %d"));
 
     svg.append("g")
             .attr("class", "axis")
@@ -124,7 +124,7 @@ function lineplot(data) {
             .call(xAxis);
 
     //  Add the Y Axis
-    yAxis = svg.append("g").attr("class", "axis").attr("id", "y_axis").call(d3.axisLeft(y));
+    yAxis = svg.append("g").attr("class", "axis").attr("id", "y_axis").call(d3.axisLeft(y).tickSizeOuter(0));
 
     svg.append("text")
       //.attr("transform", "rotate(-90)")
@@ -335,7 +335,7 @@ function lineplot(data) {
 
         // update y axis
         y.domain([0,d3.max([data[data.length-1].mileage, newGoalPaceToday])]);
-        yAxis.call(d3.axisLeft(y));
+        yAxis.call(d3.axisLeft(y).tickSizeOuter(0));
 
         // move pace line
         document.getElementById("pace_line").y2.baseVal.value = y(newGoalPaceToday);
@@ -360,14 +360,7 @@ function lineplot(data) {
     //////////////////// tool tip and mouse over code ///////////////////////////////////////////////////////////
 
     // use this in the tooltip
-    dateToString = d3.timeFormat("%b %d")
-
-    // add tooltip
-    tooltip = d3.select("#lineplot")
-      .append("div")
-      .style('visibility', 'hidden')
-      .attr('class', 'tooltip')
-      .style("pointer-events", "none");
+    dateToString = d3.timeFormat("%b %d");
 
     function pointMouseover(d){
 
@@ -409,11 +402,7 @@ function lineplot(data) {
     }
 
     function pointMouseout(){
-    
-        // hide tooltip
         tooltip.style("visibility", "hidden");
-
-        // hide intersection lines
         d3.select(".hoverLineHorizontal").style("visibility","hidden");
         d3.select(".hoverLineVerical").style("visibility","hidden");
     }
@@ -442,9 +431,9 @@ function lineplot(data) {
         var y = d3.scaleLinear().range([height, 0]).domain([0,d3.max([data[data.length-1].mileage, data[data.length-1].pace])]);
     
         // update axes
-        var xAxis = d3.axisBottom(x).ticks(numTicks).tickFormat(d3.timeFormat("%b %d"));
+        var xAxis = d3.axisBottom(x).ticks(numTicks).tickSizeOuter(0).tickFormat(d3.timeFormat("%b %d"));
         d3.select("#x_axis").call(xAxis);
-        d3.select("#y_axis").call(d3.axisLeft(y));
+        d3.select("#y_axis").call(d3.axisLeft(y).tickSizeOuter(0));
         
         // compute line function
         //mileageLine.y(function(d) { return y(d.mileage); });
@@ -577,7 +566,7 @@ function lineplot(data) {
     
         // measure how many miles I'm on pace to run by year's end
         // # of miles so far / # of days so far * 365
-        var onTrackFor = data[data.length-1].mileage / data.length * 365;
+        var onTrackFor = data[data.length-1].mileage / data[data.length-1].day_of_year * 365;
     
         // "ZZ miles this year"
         d3.select("#milesThisYearText").text(d3.format(",")(data[data.length-1].mileage.toFixed(0)) + ' miles this year'); 
@@ -614,7 +603,7 @@ function lineplot(data) {
     
             // update y axis
             y.domain([0,d3.max([data[data.length-1].mileage, newGoalPaceToday])]);
-            yAxis.call(d3.axisLeft(y));
+            yAxis.call(d3.axisLeft(y).tickSizeOuter(0));
     
             // move pace line
             document.getElementById("pace_line").y2.baseVal.value = y(newGoalPaceToday);

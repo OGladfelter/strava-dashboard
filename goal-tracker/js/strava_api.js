@@ -138,6 +138,13 @@ function updateAthleteInfo(data){
 }
 
 function renderDashboard(activityData) {
+    // add tooltip
+    tooltip = d3.select("body")
+      .append("div")
+      .style('visibility', 'hidden')
+      .attr('class', 'tooltip')
+      .style("pointer-events", "none");
+      
     mileagePlot(JSON.parse(JSON.stringify(activityData)));
     const activityDataThisYear = JSON.parse(JSON.stringify(activityData.filter(function(d){ return d.year == new Date().getFullYear().toString() })));
     lineplot(activityDataThisYear);

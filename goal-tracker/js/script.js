@@ -3,7 +3,7 @@ function groupActivities(data) {
 
     data = data.filter(d => d.type == 'Run');
 
-    const month = new Array();month[0] = "January";month[1] = "February";month[2] = "March";month[3] = "April";month[4] = "May";month[5] = "June";month[6] = "July";month[7] = "August";month[8] = "September";month[9] = "October";month[10] = "November";month[11] = "December";
+    const month = new Array();month[0] = "Jan";month[1] = "Feb";month[2] = "Mar";month[3] = "Apr";month[4] = "May";month[5] = "June";month[6] = "July";month[7] = "Aug";month[8] = "Sep";month[9] = "Oct";month[10] = "Nov";month[11] = "Dec";
 
     data.forEach(function(d, i){
         d.mileage = +d.mileage;
@@ -15,6 +15,23 @@ function groupActivities(data) {
     return d3.nest().key(function(d){return d.month;}).rollup(function(activities){
         return d3.sum(activities, function(d) {return (d.miles)});
     }).entries(data);
+}
+
+function pointMouseover(d) {
+    tooltip
+        .style("visibility", "visible")
+        .html(d.key + "<br>" + d.value.toFixed(1) + " miles")
+        .transition().duration(250)
+        .style("left", function() {
+            // if mouse is on left 80% of screen, show tooltip to right of cursor
+            if (d3.event.pageX / window.innerWidth < .8){
+                return d3.event.pageX + 10 + "px"  
+            }
+            else { // show tooltip to left of cursor
+                return d3.event.pageX - document.querySelector('.tooltip').offsetWidth - 10 + "px" 
+            }
+        }) 
+        .style("top", d3.event.pageY + 10 + "px"); 
 }
 
 function mileagePlot(activitiesData) {
@@ -37,10 +54,10 @@ function mileagePlot(activitiesData) {
 
     ////////////// the viz ///////////////
     svg = d3.select('#mileageLineplot').append("svg")
-    .attr("width",  width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("width",  width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // get max values of mileage and pace columns.
     // if I'm ahead of pace, my mileage will exceed pace. And vice versa. 
@@ -52,16 +69,13 @@ function mileagePlot(activitiesData) {
     });
     console.log(data);
 
-
     // set the ranges
     x = d3.scaleLinear().range([padding, width - padding]).domain(d3.extent(data, function(d) { return d.index; }));
     y = d3.scaleLinear().range([height - padding, padding]).domain([0, maxMileage]);
 
-    
-
     // add X axis
     //var xAxis = d3.axisBottom(x).ticks(numTicks).tickFormat(d3.timeFormat("%b '%y"));
-    var xAxis = d3.axisBottom(x).ticks(numTicks).tickFormat(function (d) {
+    var xAxis = d3.axisBottom(x).ticks(numTicks).tickSizeOuter(0).tickFormat(function (d) {
 		return data[d].key;
 	});
     svg.append("g")
@@ -71,7 +85,7 @@ function mileagePlot(activitiesData) {
             .call(xAxis);
 
     //  Add the Y Axis
-    yAxis = svg.append("g").attr("class", "axis").call(d3.axisLeft(y));
+    yAxis = svg.append("g").attr("class", "axis").call(d3.axisLeft(y).tickSizeOuter(0));
     svg.append("text")
       .attr("y", 5)
       .attr("x", 10)
@@ -100,5 +114,9 @@ function mileagePlot(activitiesData) {
         .append("circle") 
         .attr("class", "dot") 
         .attr("cx", function(d) {return x(d.index)})
-        .attr("cy", function(d) {return y(d.value)});
+        .attr("cy", function(d) {return y(d.value)})
+        .on("mouseover", pointMouseover)
+        .on("mouseout", function() {
+            tooltip.style("visibility", "hidden");
+        });  
 }
