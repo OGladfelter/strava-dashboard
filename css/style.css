@@ -18,11 +18,19 @@ body {
 }
 .right {
     width: 75%;
+    padding-top: 0px;
 }
 .row:after {
     content: "";
     display: table;
     clear: both;
+}
+
+.chartContainer {
+    margin-bottom: 20vh;
+}
+.chartContainer h2 {
+    margin-bottom: 0px;
 }
 
 h2 {
@@ -145,15 +153,17 @@ span.bylineSpan{
 .tooltip {
     position: absolute;
     min-width: 80px;
+    max-width: 200px;
     height: auto;
     background: none repeat scroll 0 0 #fafafa;
     border: 1px solid black;
     padding: 10px;
-    text-align: center;
+    text-align: left;
     border-radius: 10px;
     box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
     pointer-events: none;
     color: black;
+    line-height: 150%;
 }
 
 .annotation {
@@ -177,6 +187,25 @@ span.bylineSpan{
 .intro{
     width:35%; 
     margin:auto;
+}
+
+/* beeswarm */
+.cells path {
+    fill: none;
+    pointer-events: none;
+} 
+.cells circle {
+    fill: #ffab00;
+    r: 5;
+    stroke: gray;
+    opacity: 0.8;
+    cursor: pointer;
+}
+.cells :hover circle {
+    fill: #8ffcfc;
+    stroke: black;
+    opacity: 1;
+    r: 8;
 }
 
 @media screen and (max-width: 600px) {

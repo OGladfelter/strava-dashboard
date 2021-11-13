@@ -27,8 +27,8 @@
     <!-- Facebook Opengraph -->
     <meta property="og:url" content="http://cultureplot.com/mileage-goal-custom/" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Your 2021 Mileage" />
-    <meta property="og:description" content="Connect To Strava To Visualize Your Mileage"/>
+    <meta property="og:title" content="Your Strava Data Analyzed" />
+    <meta property="og:description" content="Connect To Strava To See Your Activity Stats"/>
 
     <meta property="og:image" content="https://cultureplot.com/img/strava_lineplot_preview.png" />
     <meta property="og:image:alt" content="Lineplot of Strava running data" />
@@ -40,7 +40,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://cultureplot.com/img/strava_lineplot_preview.png" />
     <meta name="twitter:image:alt" content="Lineplot of Strava activity data" />
-    <meta name="twitter:description" content="SConnect To Strava To Visualize Your Mileage"/>
+    <meta name="twitter:description" content="Connect To Strava To See Your Activity Stats"/>
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -76,10 +76,17 @@
 
     <div class="loader" id="loader"></div>
     
-    <div id="mileageLineplot">
+    <!-- beeswarm -->
+    <div id="beeswarm" class="chartContainer">
+        <h2>All activities</h2>
+    </div>
+
+    <!-- monthly mileage linplot -->
+    <div id="mileageLineplot" class="chartContainer">
         <h2>Mileage</h2>
     </div>
 
+    <!-- this is the interactive annual goal tracker -->
     <div class="row">
         <h2>Goal tracker: annual mileage</h2>
         <div class="column left">
@@ -91,7 +98,7 @@
             </div>
         </div>
         <div class="column right">
-            <div id="lineplot"></div>
+            <div id="lineplot" style="margin-top:0px;"></div>
         </div>
     </div>
         
