@@ -189,6 +189,10 @@ span.bylineSpan{
     margin:auto;
 }
 
+circle:hover {
+    fill: #8ffcfc;
+}
+
 /* beeswarm */
 .cells path {
     fill: none;
