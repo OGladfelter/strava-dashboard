@@ -145,9 +145,13 @@ function renderDashboard(activityData) {
       .attr('class', 'tooltip')
       .style("pointer-events", "none");
       
-    mileagePlot(JSON.parse(JSON.stringify(activityData)));
-    const activityDataThisYear = JSON.parse(JSON.stringify(activityData.filter(function(d){ return d.year == new Date().getFullYear().toString() })));
+    const data = JSON.parse(JSON.stringify(activityData));
+    const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
+
+    mileagePlot(data);
     lineplot(activityDataThisYear);
+    drawBeeswarm(data);
+
     document.getElementById("loader").style.display = 'none';
 }
 
