@@ -148,6 +148,7 @@ function renderDashboard(activityData) {
     const data = JSON.parse(JSON.stringify(activityData));
     const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
 
+    animateHeatmap(data);
     mileagePlot(data);
     lineplot(activityDataThisYear);
     drawBeeswarm(data);

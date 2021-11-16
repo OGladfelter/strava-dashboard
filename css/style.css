@@ -212,6 +212,19 @@ circle:hover {
     r: 8;
 }
 
+/* animated heatmap styles */
+.leaflet-container{ background: whitesmoke; border: 1px black solid; }
+.leaflet-top, .leaflet-bottom  {
+    z-index: 1;
+}
+.leaflet-container .leaflet-control-attribution {
+    background: none;
+}
+.heatmapContainer {
+    width:50vw; height:100vh; margin: 20px auto;
+}
+/*  */
+
 @media screen and (max-width: 600px) {
     .left {
         width: 100%;

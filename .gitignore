@@ -3,3 +3,4 @@
 *.php
 /strava-anomaly-detection
 data.json
+.vscode

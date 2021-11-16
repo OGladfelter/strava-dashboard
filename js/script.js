@@ -122,8 +122,6 @@ function mileagePlot(activitiesData) {
 
 function drawBeeswarm(data) {
 
-    console.log(data);
-
     data = data.filter(d => d.type == 'Run');
 
     if (screen.width < 600) { // mobile

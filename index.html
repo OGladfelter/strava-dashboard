@@ -49,6 +49,9 @@
 
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script type="text/javascript" src="https://rawgit.com/jieter/Leaflet.encoded/master/Polyline.encoded.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 </head>
 
 <html>
@@ -76,6 +79,12 @@
 
     <div class="loader" id="loader"></div>
     
+    <!-- animated heatmap map -->
+    <div class="heatmapContainer">
+        <div id="heatmap" style="width:100%; height:100%"></div>
+    </div>
+    <!--  -->
+
     <!-- beeswarm -->
     <div id="beeswarm" class="chartContainer">
         <!-- <h2>All activities</h2> -->
@@ -106,6 +115,7 @@
     <script src="js/strava_api.js"></script>
     <script src="js/lineplot.js"></script>
     <script src="js/script.js"></script>
+    <script src="js/heatmap.js"></script>
 
 </body>
 </html>
