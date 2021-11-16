@@ -144,14 +144,23 @@ function renderDashboard(activityData) {
       .style('visibility', 'hidden')
       .attr('class', 'tooltip')
       .style("pointer-events", "none");
-      
+     
     const data = JSON.parse(JSON.stringify(activityData));
+
+    data.forEach(function(d){ 
+        d.summary_polyline = d.map.summary_polyline;
+    });
+
     const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
 
-    animateHeatmap(data);
     mileagePlot(data);
     lineplot(activityDataThisYear);
     drawBeeswarm(data);
+
+    document.getElementById("playButton").addEventListener("click", function() {
+        d3.select("#heatmap").selectAll('path').remove();
+        animateHeatmap(data);
+    });
 
     document.getElementById("loader").style.display = 'none';
 }

@@ -6,7 +6,7 @@ body {
     margin: 0;
 }
 
-* {
+.column {
     box-sizing: border-box;
 }
 .column {
@@ -221,7 +221,11 @@ circle:hover {
     background: none;
 }
 .heatmapContainer {
-    width:50vw; height:100vh; margin: 20px auto;
+    width:100vw; height:75vh; margin: 20px auto;
+    text-align: center;
+}
+#heatmap {
+    background-color: #d4dadc;
 }
 /*  */
 
