@@ -33,6 +33,10 @@ body {
     margin-bottom: 0px;
 }
 
+h1 {
+    font-size: 52px;
+    margin-bottom: 10px;
+}
 h2 {
     font-size: 30px;
 }
@@ -77,7 +81,7 @@ a:hover {color: black; text-decoration: none;}
 }
 
 p { font-size: 18px;}
-span { font-size: 18px;}
+span { font-size: 20px;}
 span.bylineSpan{
     font-size: 18px;
 }

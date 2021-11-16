@@ -100,6 +100,8 @@ function reAuthorize(refreshToken){
 
 function getActivities(pageNum){
     
+    document.getElementById("loader").style.display = 'block';
+
     console.log(pageNum);
 
     const activities_link = `https://www.strava.com/api/v3/activities?per_page=200&access_token=` + token + "&page=" + pageNum;
@@ -133,11 +135,14 @@ function getActivities(pageNum){
 }
 
 function updateAthleteInfo(data){
-    document.getElementById("name").innerHTML = data['firstname'] + "'s 2021 Mileage";
+    document.getElementById("name").innerHTML = data['firstname'] + "'s Strava activity visualized";
     document.getElementById("profile_picture").src = data['profile_medium'];
 }
 
 function renderDashboard(activityData) {
+
+    document.getElementById("intro").style.display = 'none';
+
     // add tooltip
     tooltip = d3.select("body")
       .append("div")
@@ -172,6 +177,7 @@ function renderDashboard(activityData) {
     });
 
     document.getElementById("loader").style.display = 'none';
+    document.getElementById("dashboard").style.visibility = 'visible';
 }
 
 // for local development
