@@ -100,6 +100,7 @@ function reAuthorize(refreshToken){
 
 function getActivities(pageNum){
     
+    document.getElementById("intro").style.display = 'none';
     document.getElementById("loader").style.display = 'block';
 
     console.log(pageNum);
@@ -140,8 +141,6 @@ function updateAthleteInfo(data){
 }
 
 function renderDashboard(activityData) {
-
-    document.getElementById("intro").style.display = 'none';
 
     // add tooltip
     tooltip = d3.select("body")
