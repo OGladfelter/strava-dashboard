@@ -125,7 +125,7 @@ function getActivities(pageNum){
             //strava_data = strava_data.sort(function (a,b) {return d3.ascending(a.id, b.id); });
             strava_data = strava_data.reverse(); // reverse data since it came through in reverse-chronoligcal order
 
-            console.log(strava_data);
+            //console.log(strava_data);
 
             renderDashboard(strava_data);
         }
@@ -153,6 +153,9 @@ function renderDashboard(activityData) {
 
     const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
 
+    // center map on start location of their most recent activity
+    map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
+
     mileagePlot(data);
     lineplot(activityDataThisYear);
     drawBeeswarm(data);
@@ -164,6 +167,8 @@ function renderDashboard(activityData) {
     document.getElementById("skipButton").addEventListener("click", function() {
         d3.select("#heatmap").selectAll('path').remove();
         animateHeatmap(data, 'Y');
+        clearTimeout(timer);
+        enableZoom();
     });
 
     document.getElementById("loader").style.display = 'none';

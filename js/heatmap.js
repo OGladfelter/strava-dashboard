@@ -88,15 +88,19 @@ function animateHeatmap(data, fastForward = 'N') {
         .style("stroke", endingColor); // fade line to endingColor value
 
     // wait till animation finishes, then re-enable dragging and zooming   
-    setTimeout(function() {
-        map.dragging.enable();
-        map.touchZoom.enable();
-        map.doubleClickZoom.enable();
-        map.scrollWheelZoom.enable();
-        map.boxZoom.enable();
-        map.keyboard.enable();
-        $(".leaflet-control-zoom").css("opacity", 1).css("pointer-events", "initial");
-        map.options.minZoom = 1;
-        map.options.maxZoom = 14;
+    timer = setTimeout(function() {
+        enableZoom();
     }, delayLength(d3.select("#heatmap").selectAll("path")._groups[0].length));
+}
+
+function enableZoom() {
+    map.dragging.enable();
+    map.touchZoom.enable();
+    map.doubleClickZoom.enable();
+    map.scrollWheelZoom.enable();
+    map.boxZoom.enable();
+    map.keyboard.enable();
+    $(".leaflet-control-zoom").css("opacity", 1).css("pointer-events", "initial");
+    map.options.minZoom = 1;
+    map.options.maxZoom = 14;
 }
