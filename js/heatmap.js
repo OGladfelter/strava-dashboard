@@ -8,6 +8,7 @@ var map = new L.Map('heatmap', {
   'center': [40.655239, -73.972084],
   'zoom': 12,
   'maxZoom': 14, 
+  'minZoom': 1,
   'layers': [mapTiles],
 });
 map.setMaxBounds([[-90,-180], [90,180]]);
@@ -17,7 +18,7 @@ map.setMaxBounds([[-90,-180], [90,180]]);
 // });
 //////////
 
-var zoomExtent = 13, speed = 8, startingColor = 'red', endingColor = '#0e005e';
+var zoomExtent = 13, speed = 4, startingColor = 'red', endingColor = '#0e005e';
 
 // read and map data
 function animateHeatmap(data, fastForward = 'N') {
@@ -85,9 +86,17 @@ function animateHeatmap(data, fastForward = 'N') {
         .duration(1000)
         .style("opacity", 0.3) // fade line out
         .style("stroke", endingColor); // fade line to endingColor value
-}
 
-function fastForward() {
-    d3.select("#heatmap").selectAll('path').remove();
-    animateHeatmap('Y');
+    // wait till animation finishes, then re-enable dragging and zooming   
+    setTimeout(function() {
+        map.dragging.enable();
+        map.touchZoom.enable();
+        map.doubleClickZoom.enable();
+        map.scrollWheelZoom.enable();
+        map.boxZoom.enable();
+        map.keyboard.enable();
+        $(".leaflet-control-zoom").css("opacity", 1).css("pointer-events", "initial");
+        map.options.minZoom = 1;
+        map.options.maxZoom = 14;
+    }, delayLength(d3.select("#heatmap").selectAll("path")._groups[0].length));
 }

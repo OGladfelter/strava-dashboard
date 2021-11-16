@@ -161,6 +161,10 @@ function renderDashboard(activityData) {
         d3.select("#heatmap").selectAll('path').remove();
         animateHeatmap(data);
     });
+    document.getElementById("skipButton").addEventListener("click", function() {
+        d3.select("#heatmap").selectAll('path').remove();
+        animateHeatmap(data, 'Y');
+    });
 
     document.getElementById("loader").style.display = 'none';
 }
