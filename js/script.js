@@ -136,7 +136,6 @@ function drawBeeswarm(data) {
         var width = window.innerWidth * .8 - margin.left - margin.right;
         var numTicks = 8;
     }
-    var padding = 10;
 
     ////////////// the viz ///////////////
     var svg = d3.select('#beeswarm').append("svg")
@@ -144,8 +143,6 @@ function drawBeeswarm(data) {
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    var formatValue = d3.format(",d");
 
     var x = d3.scaleLinear()
         .rangeRound([0, width]);
@@ -167,7 +164,7 @@ function drawBeeswarm(data) {
     g.append("g")
         .attr("class", "axis axis--x")
         .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x).ticks(10).tickSizeOuter(0));
+        .call(d3.axisBottom(x).ticks(numTicks).tickSizeOuter(0).tickFormat(function (d) { if (Math.floor(d) != d) { return; } else { return d } } ));
 
     var cell = g.append("g")
         .attr("class", "cells")
@@ -222,7 +219,7 @@ function updateBeeswarm(data) {
 
     for (var i = 0; i < 120; ++i) simulation.tick();
 
-    d3.select("#beeswarm").select(".axis--x").call(d3.axisBottom(x).ticks(10).tickSizeOuter(0));
+    d3.select("#beeswarm").select(".axis--x").call(d3.axisBottom(x).tickFormat(function (d) { if (Math.floor(d) != d) { return; } else { return d } } ));
 
     d3.select("#beeswarm").select(".cells").remove();
 
