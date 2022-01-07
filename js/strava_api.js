@@ -128,7 +128,7 @@ function getActivities(pageNum){
             //strava_data = strava_data.sort(function (a,b) {return d3.ascending(a.id, b.id); });
             strava_data = strava_data.reverse(); // reverse data since it came through in reverse-chronoligcal order
 
-            //console.log(strava_data);
+            console.log(strava_data);
 
             renderDashboard(strava_data);
         }
@@ -155,13 +155,71 @@ function renderDashboard(activityData) {
         d.summary_polyline = d.map.summary_polyline;
     });
 
+     // create array of all unique activity types in user's data
+     activityTypes = d3.map(data, function(d){return d.type;}).keys();
+     document.getElementById("dropdownButton").innerHTML = activityTypes.length + " activities";
+      
+     // if there's only one type of activity, hide the activity row in filter menu
+     if (activityTypes.length == 1) {
+         document.getElementById("activitiesFilter").style.display = "none";
+     }
+     else {
+         activityTypes.forEach(function(activity) {
+             var div = document.getElementById("activityMenu");
+             var input = document.createElement("input");
+             input.type = "checkbox";
+             input.id = activity + "Box";
+             input.name = activity + "Name";
+             input.value = activity;
+             input.checked = true;
+             input.classList.add("activityCheckbox");
+ 
+             var label = document.createElement("label");
+             label.for = activity + "Name";
+             label.id = activity + "BoxLabel";
+             label.innerHTML = activity.replace(/([A-Z])/g, " $1");
+ 
+             var container = document.createElement("div");
+             container.classList.add("checkboxContainer");
+             container.appendChild(input);
+             container.appendChild(label);
+ 
+             container.addEventListener("click", function(){
+                 input.checked ? input.checked = false : input.checked = true;
+ 
+                 if (input.checked) { // if box is checked, add activity from activityTypes
+                     activityTypes.push(activity);
+                 } 
+                 else { // if box is unchecked, remove activity from activityTypes
+                     const index = activityTypes.indexOf(activity);
+                     if (index > -1) {
+                         activityTypes.splice(index, 1);
+                     }
+                 }
+ 
+                 if (activityTypes.length == "1"){
+                     document.getElementById("dropdownButton").innerHTML = activityTypes[0].replace(/([A-Z])/g, " $1");
+                 }
+                 else{
+                     document.getElementById("dropdownButton").innerHTML = activityTypes.length + " activities";
+                 }
+             });
+             div.appendChild(container);
+         });
+     }
+
     const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
 
     // center map on start location of their most recent activity
     map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
 
     mileagePlot(data);
-    lineplot(activityDataThisYear);
+    if (activityDataThisYear.length > 1) {
+        lineplot(activityDataThisYear);
+    }
+    else {
+        document.getElementById("goalTracker").style.display = 'none';
+    }
     drawBeeswarm(data);
 
     document.getElementById("playButton").addEventListener("click", function() {
@@ -182,5 +240,6 @@ function renderDashboard(activityData) {
 // for local development
 d3.json("data.json", function(error, data) {
     data = data.reverse();
+    console.log(data);
     renderDashboard(data);
 });

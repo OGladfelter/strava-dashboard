@@ -6,6 +6,35 @@ body {
     margin: 0;
 }
 
+/* dropdown filter */
+.dropdown {
+    display: inline-block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 20%;
+}
+.dropbtn {
+    background-color: rgba(255, 166, 0, 0.8);
+    color: black;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px rgb(220, 220, 220) solid;
+    width: 100%;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    text-align: left;
+    border-collapse: collapse;
+}
+.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropbtn {background-color: orange;}
+.dropdown:focus .dropdown-content {display: block;}
+
 .column {
     box-sizing: border-box;
 }
