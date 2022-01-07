@@ -128,7 +128,7 @@ function getActivities(pageNum){
             //strava_data = strava_data.sort(function (a,b) {return d3.ascending(a.id, b.id); });
             strava_data = strava_data.reverse(); // reverse data since it came through in reverse-chronoligcal order
 
-            //console.log(strava_data);
+            console.log(strava_data);
 
             renderDashboard(strava_data);
         }
@@ -149,20 +149,41 @@ function renderDashboard(activityData) {
       .attr('class', 'tooltip')
       .style("pointer-events", "none");
      
-    const data = JSON.parse(JSON.stringify(activityData));
+    let data = JSON.parse(JSON.stringify(activityData));
 
     data.forEach(function(d){ 
         d.summary_polyline = d.map.summary_polyline;
     });
+    data = data.filter(d => d.summary_polyline); // remove activities without GPS
+    //data = data.filter(d => d.type == 'Kayaking');
+    console.log(data);
 
-    const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
+    // create array of all unique activity types in user's data and add each to dropdown filter
+    activityTypes = d3.map(data, function(d){return d.type;}).keys();
+    document.getElementById("dropdownButton").innerHTML = activityTypes.length + " activity types";
+    if (activityTypes.length == 1) {
+        // hide filter
+        document.getElementById("activitiesFilter").style.display = "none";
+    }
+    else {
+        activityTypes.forEach(function(activity) {
+            addFilterOption(activity);
+        });
+    }
 
     // center map on start location of their most recent activity
     map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
 
-    mileagePlot(data);
-    lineplot(activityDataThisYear);
     drawBeeswarm(data);
+    mileagePlot(data);
+
+    const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
+    if (activityDataThisYear.length > 1) {
+        lineplot(activityDataThisYear);
+    }
+    else {
+        document.getElementById("goalTracker").style.display = 'none';
+    }
 
     document.getElementById("playButton").addEventListener("click", function() {
         d3.select("#heatmap").selectAll('path').remove();
@@ -177,6 +198,56 @@ function renderDashboard(activityData) {
 
     document.getElementById("loader").style.display = 'none';
     document.getElementById("dashboard").style.visibility = 'visible';
+}
+
+function filterActivityType(input, activity) {
+    if (input.checked) { // if box is checked, add activity from activityTypes
+        activityTypes.push(activity);
+    } 
+    else { // if box is unchecked, remove activity from activityTypes
+        const index = activityTypes.indexOf(activity);
+        if (index > -1) {
+            activityTypes.splice(index, 1);
+        }
+    }
+
+    if (activityTypes.length == "1") {
+        document.getElementById("dropdownButton").innerHTML = activityTypes[0].replace(/([A-Z])/g, " $1");
+    }
+    else {
+        document.getElementById("dropdownButton").innerHTML = activityTypes.length + " activity types";
+    }
+}
+
+function addFilterOption(activity) {
+    var div = document.getElementById("activityMenu");
+    var input = document.createElement("input");
+    input.type = "checkbox";
+    input.id = activity + "Box";
+    input.name = activity + "Name";
+    input.value = activity;
+    input.checked = true;
+
+    var label = document.createElement("label");
+    label.for = activity + "Name";
+    label.id = activity + "BoxLabel";
+    label.innerHTML = activity.replace(/([A-Z])/g, " $1");
+    label.style.pointerEvents = 'none';
+
+    var container = document.createElement("div");
+    container.classList.add("checkboxContainer");
+    container.appendChild(input);
+    container.appendChild(label);
+
+    input.addEventListener("click", function(event) {
+        filterActivityType(input, activity);
+        event.stopPropagation();
+    });
+    container.addEventListener("click", function() {
+        input.checked ? input.checked = false : input.checked = true;
+        filterActivityType(input, activity);
+    });
+    div.appendChild(container);
 }
 
 // for local development
