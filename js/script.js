@@ -146,12 +146,7 @@ function updateMileagePlot(activitiesData) {
     var padding = 10;
 
     ////////////// the viz ///////////////
-    svg = d3.select('#mileageLineplot').append("svg")
-        .attr("width",  width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
+    
     // get max values of mileage and pace columns.
     // if I'm ahead of pace, my mileage will exceed pace. And vice versa. 
     // regardless, the higher value should cap the y-axis
@@ -185,24 +180,21 @@ function updateMileagePlot(activitiesData) {
     d3.select('#mileageLineplot').select(".mileage_line")
         .data([data]) 
         .transition()
-        .duration(3000)
+        .duration(2000)
         .attr("d", mileageLine); 
 
-    // remove old dots
-    d3.select('#mileageLineplot').selectAll(".dot").remove();
-
-    // draw new dots
-    d3.select('#mileageLineplot').select("svg").selectAll(".dot")
-        .data(data)
-        .enter()
-        .append("circle") 
-        .attr("class", "dot") 
-        .attr("cx", function(d) {return x(d.index)})
-        .attr("cy", function(d) {return y(d.value)})
-        .on("mouseover", function(d) { callTooltip(d, d.key + "<br>" + d.value.toFixed(1) + " miles") })
-        .on("mouseout", function() {
-            tooltip.style("visibility", "hidden");
-        });   
+    //rejoin data
+    var circle = d3.select('#mileageLineplot').select("svg").selectAll("circle").data(data)
+    circle.enter().append("circle").attr("class", "dot");
+    circle.exit().remove(); //remove unneeded circles
+    circle.transition()
+        .duration(2000)
+        .attr("cx",function(d){
+            return x(d.index)
+        })
+        .attr("cy",function(d){
+            return y(d.value)
+        });
 }
 
 function drawBeeswarm(data) {
