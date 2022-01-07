@@ -155,56 +155,16 @@ function renderDashboard(activityData) {
         d.summary_polyline = d.map.summary_polyline;
     });
 
-     // create array of all unique activity types in user's data
+     // create array of all unique activity types in user's data and add each to dropdown filter
      activityTypes = d3.map(data, function(d){return d.type;}).keys();
-     document.getElementById("dropdownButton").innerHTML = activityTypes.length + " activities";
-      
-     // if there's only one type of activity, hide the activity row in filter menu
+     document.getElementById("dropdownButton").innerHTML = activityTypes.length + " activity types";
      if (activityTypes.length == 1) {
+         // hide filter
          document.getElementById("activitiesFilter").style.display = "none";
      }
      else {
          activityTypes.forEach(function(activity) {
-             var div = document.getElementById("activityMenu");
-             var input = document.createElement("input");
-             input.type = "checkbox";
-             input.id = activity + "Box";
-             input.name = activity + "Name";
-             input.value = activity;
-             input.checked = true;
-             input.classList.add("activityCheckbox");
- 
-             var label = document.createElement("label");
-             label.for = activity + "Name";
-             label.id = activity + "BoxLabel";
-             label.innerHTML = activity.replace(/([A-Z])/g, " $1");
- 
-             var container = document.createElement("div");
-             container.classList.add("checkboxContainer");
-             container.appendChild(input);
-             container.appendChild(label);
- 
-             container.addEventListener("click", function(){
-                 input.checked ? input.checked = false : input.checked = true;
- 
-                 if (input.checked) { // if box is checked, add activity from activityTypes
-                     activityTypes.push(activity);
-                 } 
-                 else { // if box is unchecked, remove activity from activityTypes
-                     const index = activityTypes.indexOf(activity);
-                     if (index > -1) {
-                         activityTypes.splice(index, 1);
-                     }
-                 }
- 
-                 if (activityTypes.length == "1"){
-                     document.getElementById("dropdownButton").innerHTML = activityTypes[0].replace(/([A-Z])/g, " $1");
-                 }
-                 else{
-                     document.getElementById("dropdownButton").innerHTML = activityTypes.length + " activities";
-                 }
-             });
-             div.appendChild(container);
+            addFilterOption(activity);
          });
      }
 
@@ -235,6 +195,49 @@ function renderDashboard(activityData) {
 
     document.getElementById("loader").style.display = 'none';
     document.getElementById("dashboard").style.visibility = 'visible';
+}
+
+function addFilterOption(activity) {
+    var div = document.getElementById("activityMenu");
+    var input = document.createElement("input");
+    input.type = "checkbox";
+    input.id = activity + "Box";
+    input.name = activity + "Name";
+    input.value = activity;
+    input.checked = true;
+    input.classList.add("activityCheckbox");
+
+    var label = document.createElement("label");
+    label.for = activity + "Name";
+    label.id = activity + "BoxLabel";
+    label.innerHTML = activity.replace(/([A-Z])/g, " $1");
+
+    var container = document.createElement("div");
+    container.classList.add("checkboxContainer");
+    container.appendChild(input);
+    container.appendChild(label);
+
+    container.addEventListener("click", function(){
+        input.checked ? input.checked = false : input.checked = true;
+
+        if (input.checked) { // if box is checked, add activity from activityTypes
+            activityTypes.push(activity);
+        } 
+        else { // if box is unchecked, remove activity from activityTypes
+            const index = activityTypes.indexOf(activity);
+            if (index > -1) {
+                activityTypes.splice(index, 1);
+            }
+        }
+
+        if (activityTypes.length == "1") {
+            document.getElementById("dropdownButton").innerHTML = activityTypes[0].replace(/([A-Z])/g, " $1");
+        }
+        else {
+            document.getElementById("dropdownButton").innerHTML = activityTypes.length + " activity types";
+        }
+    });
+    div.appendChild(container);
 }
 
 // for local development
