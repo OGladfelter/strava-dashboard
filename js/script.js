@@ -38,8 +38,6 @@ function mileagePlot(activitiesData) {
 
     var data = groupActivities(activitiesData);
 
-    console.log(data);
-
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};
         var height = window.innerHeight * .8 - margin.left - margin.right;
@@ -126,9 +124,6 @@ function mileagePlot(activitiesData) {
 }
 
 function drawBeeswarm(data) {
-
-    // data = data.filter(d => d.type == 'Run');
-
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};
         var height = window.innerHeight * .8 - margin.left - margin.right;
@@ -156,7 +151,8 @@ function drawBeeswarm(data) {
         .rangeRound([0, width]);
 
     var g = svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .attr("id", "beeswarm-g");
 
     x.domain(d3.extent(data, function(d) { return d.miles; }));
 
@@ -172,6 +168,65 @@ function drawBeeswarm(data) {
         .attr("class", "axis axis--x")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(x).ticks(10).tickSizeOuter(0));
+
+    var cell = g.append("g")
+        .attr("class", "cells")
+        .selectAll("g").data(d3.voronoi()
+            .extent([[-margin.left, -margin.top], [width + margin.right, height + margin.top]])
+            .x(function(d) { return d.x; })
+            .y(function(d) { return d.y; })
+        .polygons(data)).enter().append("g");
+
+    cell.append("circle")
+        .attr("class", "bee")
+        .attr("cx", function(d) { return d.data.x; })
+        .attr("cy", function(d) { return d.data.y; })
+        .on("mouseover", function(d) { 
+            d3.select(this).raise(); 
+            callTooltip(d, d.data.name + "<br><hr>" + d.data.start_date.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
+        })
+        .on("mouseout", function() {
+            tooltip.style("visibility", "hidden");
+        })
+        .on("click", function(d) { 
+            var url = "https://www.strava.com/activities/" + d.data.id;
+            window.open(url, '_blank').focus();
+        });
+
+    cell.append("path").attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+}
+
+function updateBeeswarm(data) {
+    if (screen.width < 600) { // mobile
+        var margin = {top: 20, right: 50, bottom: 50, left: 50};
+        var height = window.innerHeight * .8 - margin.left - margin.right;
+        var width = window.innerWidth * .95 - margin.top - margin.bottom;
+        var numTicks = 3;
+    }
+    else { // larger device
+        var margin = {top: 30, right: 100, bottom: 50, left: 50};
+        var height = window.innerHeight * .5 - margin.top - margin.bottom;
+        var width = window.innerWidth * .8 - margin.left - margin.right;
+        var numTicks = 8;
+    }
+
+    var x = d3.scaleLinear()
+        .rangeRound([0, width])
+        .domain(d3.extent(data, function(d) { return d.miles; }));
+
+    var simulation = d3.forceSimulation(data)
+        .force("x", d3.forceX(function(d) { return x(d.miles); }).strength(5))
+        .force("y", d3.forceY(height / 2))
+        .force("collide", d3.forceCollide(7))
+        .stop();
+
+    for (var i = 0; i < 120; ++i) simulation.tick();
+
+    d3.select("#beeswarm").select(".axis--x").call(d3.axisBottom(x).ticks(10).tickSizeOuter(0));
+
+    d3.select("#beeswarm").select(".cells").remove();
+
+    var g = d3.select("#beeswarm").select("#beeswarm-g");
 
     var cell = g.append("g")
         .attr("class", "cells")

@@ -167,14 +167,12 @@ function renderDashboard(activityData) {
     }
     else {
         activityTypes.forEach(function(activity) {
-            addFilterOption(activity);
+            addFilterOption(activity, data);
         });
     }
 
-    // center map on start location of their most recent activity
-    map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
-
     drawBeeswarm(data);
+
     mileagePlot(data);
 
     const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
@@ -185,6 +183,8 @@ function renderDashboard(activityData) {
         document.getElementById("goalTracker").style.display = 'none';
     }
 
+    // center map on start location of their most recent activity
+    map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
     document.getElementById("playButton").addEventListener("click", function() {
         d3.select("#heatmap").selectAll('path').remove();
         animateHeatmap(data);
@@ -200,7 +200,7 @@ function renderDashboard(activityData) {
     document.getElementById("dashboard").style.visibility = 'visible';
 }
 
-function filterActivityType(input, activity) {
+function filterActivityType(input, activity, data) {
     if (input.checked) { // if box is checked, add activity from activityTypes
         activityTypes.push(activity);
     } 
@@ -211,15 +211,20 @@ function filterActivityType(input, activity) {
         }
     }
 
+    // rewrite button html
     if (activityTypes.length == "1") {
         document.getElementById("dropdownButton").innerHTML = activityTypes[0].replace(/([A-Z])/g, " $1");
     }
     else {
         document.getElementById("dropdownButton").innerHTML = activityTypes.length + " activity types";
     }
+
+    // filter data and update charts
+    data = data.filter(d => activityTypes.includes(d.type));
+    updateBeeswarm(data);
 }
 
-function addFilterOption(activity) {
+function addFilterOption(activity, data) {
     var div = document.getElementById("activityMenu");
     var input = document.createElement("input");
     input.type = "checkbox";
@@ -240,12 +245,12 @@ function addFilterOption(activity) {
     container.appendChild(label);
 
     input.addEventListener("click", function(event) {
-        filterActivityType(input, activity);
+        filterActivityType(input, activity, data);
         event.stopPropagation();
     });
     container.addEventListener("click", function() {
         input.checked ? input.checked = false : input.checked = true;
-        filterActivityType(input, activity);
+        filterActivityType(input, activity, data);
     });
     div.appendChild(container);
 }
