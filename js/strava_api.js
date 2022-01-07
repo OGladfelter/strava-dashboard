@@ -149,38 +149,41 @@ function renderDashboard(activityData) {
       .attr('class', 'tooltip')
       .style("pointer-events", "none");
      
-    const data = JSON.parse(JSON.stringify(activityData));
+    let data = JSON.parse(JSON.stringify(activityData));
 
     data.forEach(function(d){ 
         d.summary_polyline = d.map.summary_polyline;
     });
+    data = data.filter(d => d.summary_polyline); // remove activities without GPS
+    //data = data.filter(d => d.type == 'Kayaking');
+    console.log(data);
 
-     // create array of all unique activity types in user's data and add each to dropdown filter
-     activityTypes = d3.map(data, function(d){return d.type;}).keys();
-     document.getElementById("dropdownButton").innerHTML = activityTypes.length + " activity types";
-     if (activityTypes.length == 1) {
-         // hide filter
-         document.getElementById("activitiesFilter").style.display = "none";
-     }
-     else {
-         activityTypes.forEach(function(activity) {
+    // create array of all unique activity types in user's data and add each to dropdown filter
+    activityTypes = d3.map(data, function(d){return d.type;}).keys();
+    document.getElementById("dropdownButton").innerHTML = activityTypes.length + " activity types";
+    if (activityTypes.length == 1) {
+        // hide filter
+        document.getElementById("activitiesFilter").style.display = "none";
+    }
+    else {
+        activityTypes.forEach(function(activity) {
             addFilterOption(activity);
-         });
-     }
-
-    const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
+        });
+    }
 
     // center map on start location of their most recent activity
     map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
 
+    drawBeeswarm(data);
     mileagePlot(data);
+
+    const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
     if (activityDataThisYear.length > 1) {
         lineplot(activityDataThisYear);
     }
     else {
         document.getElementById("goalTracker").style.display = 'none';
     }
-    drawBeeswarm(data);
 
     document.getElementById("playButton").addEventListener("click", function() {
         d3.select("#heatmap").selectAll('path').remove();
@@ -250,6 +253,5 @@ function addFilterOption(activity) {
 // for local development
 d3.json("data.json", function(error, data) {
     data = data.reverse();
-    console.log(data);
     renderDashboard(data);
 });

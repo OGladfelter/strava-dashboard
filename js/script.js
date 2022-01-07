@@ -1,7 +1,7 @@
 function groupActivities(data) {
     var parseDate = d3.timeParse("%Y-%m-%d");
 
-    data = data.filter(d => d.type == 'Run');
+    //data = data.filter(d => d.type == 'Run');
 
     const month = new Array();month[0] = "Jan";month[1] = "Feb";month[2] = "Mar";month[3] = "Apr";month[4] = "May";month[5] = "June";month[6] = "July";month[7] = "Aug";month[8] = "Sep";month[9] = "Oct";month[10] = "Nov";month[11] = "Dec";
 
@@ -37,6 +37,8 @@ function callTooltip(d, text) {
 function mileagePlot(activitiesData) {
 
     var data = groupActivities(activitiesData);
+
+    console.log(data);
 
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};
@@ -75,6 +77,9 @@ function mileagePlot(activitiesData) {
     // add X axis
     //var xAxis = d3.axisBottom(x).ticks(numTicks).tickFormat(d3.timeFormat("%b '%y"));
     var xAxis = d3.axisBottom(x).ticks(numTicks).tickSizeOuter(0).tickFormat(function (d) {
+        if (Math.floor(d) != d) {
+            return;
+        }
 		return data[d].key;
 	});
     svg.append("g")
@@ -122,7 +127,7 @@ function mileagePlot(activitiesData) {
 
 function drawBeeswarm(data) {
 
-    data = data.filter(d => d.type == 'Run');
+    // data = data.filter(d => d.type == 'Run');
 
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};

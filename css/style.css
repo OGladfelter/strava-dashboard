@@ -10,8 +10,8 @@ body {
 .dropdown {
     display: inline-block;
     position: fixed;
-    top: 0;
-    right: 10px;
+    top: 5px;
+    right: 5px;
     width: 20%;
 }
 .dropbtn {
@@ -42,7 +42,6 @@ body {
 .checkboxContainer:hover {cursor: pointer; background-color: rgba(255, 171, 0, 0.75)}
 .dropdown:hover .dropdown-content {display: block;}
 .dropdown:hover .dropbtn {background-color: orange;}
-.dropdown:focus .dropdown-content {display: block;}
 
 .column {
     box-sizing: border-box;
