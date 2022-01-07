@@ -197,6 +197,25 @@ function renderDashboard(activityData) {
     document.getElementById("dashboard").style.visibility = 'visible';
 }
 
+function filterActivityType(input, activity) {
+    if (input.checked) { // if box is checked, add activity from activityTypes
+        activityTypes.push(activity);
+    } 
+    else { // if box is unchecked, remove activity from activityTypes
+        const index = activityTypes.indexOf(activity);
+        if (index > -1) {
+            activityTypes.splice(index, 1);
+        }
+    }
+
+    if (activityTypes.length == "1") {
+        document.getElementById("dropdownButton").innerHTML = activityTypes[0].replace(/([A-Z])/g, " $1");
+    }
+    else {
+        document.getElementById("dropdownButton").innerHTML = activityTypes.length + " activity types";
+    }
+}
+
 function addFilterOption(activity) {
     var div = document.getElementById("activityMenu");
     var input = document.createElement("input");
@@ -205,37 +224,25 @@ function addFilterOption(activity) {
     input.name = activity + "Name";
     input.value = activity;
     input.checked = true;
-    input.classList.add("activityCheckbox");
 
     var label = document.createElement("label");
     label.for = activity + "Name";
     label.id = activity + "BoxLabel";
     label.innerHTML = activity.replace(/([A-Z])/g, " $1");
+    label.style.pointerEvents = 'none';
 
     var container = document.createElement("div");
     container.classList.add("checkboxContainer");
     container.appendChild(input);
     container.appendChild(label);
 
-    container.addEventListener("click", function(){
+    input.addEventListener("click", function(event) {
+        filterActivityType(input, activity);
+        event.stopPropagation();
+    });
+    container.addEventListener("click", function() {
         input.checked ? input.checked = false : input.checked = true;
-
-        if (input.checked) { // if box is checked, add activity from activityTypes
-            activityTypes.push(activity);
-        } 
-        else { // if box is unchecked, remove activity from activityTypes
-            const index = activityTypes.indexOf(activity);
-            if (index > -1) {
-                activityTypes.splice(index, 1);
-            }
-        }
-
-        if (activityTypes.length == "1") {
-            document.getElementById("dropdownButton").innerHTML = activityTypes[0].replace(/([A-Z])/g, " $1");
-        }
-        else {
-            document.getElementById("dropdownButton").innerHTML = activityTypes.length + " activity types";
-        }
+        filterActivityType(input, activity);
     });
     div.appendChild(container);
 }
