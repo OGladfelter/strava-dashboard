@@ -23,7 +23,8 @@ var zoomExtent = 13, speed = 4, startingColor = 'red', endingColor = '#0e005e';
 // read and map data
 function animateHeatmap(data, fastForward = 'N') {
 
-    //data = data.filter(d => d.type == "Run");
+    // remove lines from previous animation
+    d3.select("#heatmap").selectAll("path").remove();
 
     // turn off all dragging and zooming while the animation plays. Turn back on later.
     map.dragging.disable();
@@ -37,15 +38,13 @@ function animateHeatmap(data, fastForward = 'N') {
     map.options.maxZoom = 12;
 
     // filter out activities without a summary polyline
-    data = data.filter(d => d.summary_polyline != "" && d.summary_polyline != undefined);
+    data = data.filter(d => d.summary_polyline);
+    //data = data.filter(d => activityTypes.includes(d.type)); // this could be a fail safe if the filters have issues in the future?
 
     // draw the activity lines onto the map
     data.forEach(d => {        
         // translate summary polyline into array of coordinates
         var coordinates = L.Polyline.fromEncoded(d.summary_polyline).getLatLngs();
-
-        //console.log(coordinates);
-        // don't add activities to map unless they're within the user-set boundaries
 
         L.polyline(
             coordinates,
@@ -87,7 +86,7 @@ function animateHeatmap(data, fastForward = 'N') {
         .style("opacity", 0.3) // fade line out
         .style("stroke", endingColor); // fade line to endingColor value
 
-    // wait till animation finishes, then re-enable dragging and zooming   
+    // wait till animation finishes, then re-enable dragging and zooming
     timer = setTimeout(function() {
         enableZoom();
     }, delayLength(d3.select("#heatmap").selectAll("path")._groups[0].length));
