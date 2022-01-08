@@ -432,9 +432,6 @@ function updateGoalplot(data) {
     // move pace line
     document.getElementById("pace_line").y2.baseVal.value = y(data[data.length-1].pace);
 
-    svg.selectAll(".dot").remove();
-    svg.selectAll(".label").remove();
-
     // for dot hover interactivity
     function pointMouseover(d){
 
@@ -485,6 +482,9 @@ function updateGoalplot(data) {
         d3.select(".hoverLineVerical").style("visibility","hidden");
     }
 
+    svg.selectAll(".dot").remove();
+    svg.selectAll(".label").remove();
+    
     // draw dots
     svg.selectAll(".dot")
         .data(data)
