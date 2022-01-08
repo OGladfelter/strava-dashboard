@@ -49,8 +49,6 @@ function drawGoalplot(data) {
         d.pace = (annual_mileage_goal / 365) * day_of_year;
     });
 
-    console.log(data);
-
     // control how many labels are shown: lower number = more labels. Ex: 2 = label every other day, 10 = every other 10 days
     // label more on larger screen, less on small screen
     if (screen.width < 600){
@@ -130,7 +128,7 @@ function drawGoalplot(data) {
         .attr("class", "dot") 
         .attr("cx", function(d) {return x(d.date)})
         .attr("cy", function(d) {return y(d.mileage)})
-        .style("display", function(d) { console.log(d.miles); if (d.miles == 0) { return 'none' } else { return 'block'}})
+        .style("display", function(d) { if (d.miles == 0) { return 'none' } else { return 'block'}})
         .on("mouseover", pointMouseover)
         .on("mouseout", pointMouseout);  
 
@@ -156,7 +154,7 @@ function drawGoalplot(data) {
                 return "";
             }
         })
-        .style("display", function(d) { console.log(d.miles); if (d.miles == 0) { return 'none' } else { return 'block'}})
+        .style("display", function(d) { if (d.miles == 0) { return 'none' } else { return 'block'}})
         .call(getTextBox);
     
     // draw rectangle on top of text label; called on every text label;
@@ -517,7 +515,7 @@ function updateGoalplot(data) {
         .attr("class", "dot") 
         .attr("cx", function(d) {return x(d.date)})
         .attr("cy", function(d) {return y(d.mileage)})
-        .style("display", function(d) { console.log(d.miles); if (d.miles == 0) { return 'none' } else { return 'block'}})
+        .style("display", function(d) { if (d.miles == 0) { return 'none' } else { return 'block'}})
         .on("mouseover", pointMouseover)
         .on("mouseout", pointMouseout);  
 
@@ -543,7 +541,7 @@ function updateGoalplot(data) {
                 return "";
             }
         })
-        .style("display", function(d) { console.log(d.miles); if (d.miles == 0) { return 'none' } else { return 'block'}})
+        .style("display", function(d) { if (d.miles == 0) { return 'none' } else { return 'block'}})
         .call(getTextBox);
 
     function getTextBox(selection) {
