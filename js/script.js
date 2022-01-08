@@ -1,4 +1,4 @@
-function groupActivities(data) {
+function fillMissingDates(data) {
     var parseDate = d3.timeParse("%Y-%m-%d");
     data.forEach(function(d){
         d.date = parseDate(d.start_date.split("T")[0]); // parse strings into date object
@@ -14,10 +14,14 @@ function groupActivities(data) {
     completeData.sort(function(a,b){
         return a.date - b.date;
     });
+    return completeData;
+}
+
+function groupActivities(data) {
 
     const month = new Array();month[0] = "Jan";month[1] = "Feb";month[2] = "Mar";month[3] = "Apr";month[4] = "May";month[5] = "June";month[6] = "July";month[7] = "Aug";month[8] = "Sep";month[9] = "Oct";month[10] = "Nov";month[11] = "Dec";
 
-    completeData.forEach(function(d, i){
+    data.forEach(function(d, i){
         d.mileage = +d.mileage;
         // d.date = parseDate(d.start_date_local.split("T")[0]);
         d.year = d.date.getFullYear();
@@ -26,7 +30,7 @@ function groupActivities(data) {
 
     return d3.nest().key(function(d){return d.month;}).rollup(function(activities){
         return d3.sum(activities, function(d) {return (d.miles)});
-    }).entries(completeData);
+    }).entries(data);
 }
 
 function callTooltip(d, text) {
@@ -59,7 +63,8 @@ const getDatesBetween = (startDate, endDate, includeEndDate) => {
 
 function mileagePlot(activitiesData) {
 
-    var data = groupActivities(activitiesData);
+    var completeData = fillMissingDates(activitiesData);
+    var data = groupActivities(completeData);
 
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};
@@ -154,7 +159,8 @@ function mileagePlot(activitiesData) {
 
 function updateMileagePlot(activitiesData) {
 
-    var data = groupActivities(activitiesData);
+    var completeData = fillMissingDates(activitiesData);
+    var data = groupActivities(completeData);
 
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};
