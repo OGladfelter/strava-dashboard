@@ -200,13 +200,13 @@ function updateMileagePlot(activitiesData) {
 
 function drawBeeswarm(data) {
     if (screen.width < 600) { // mobile
-        var margin = {top: 20, right: 50, bottom: 50, left: 50};
+        var margin = {top: 20, right: 50, bottom: 60, left: 50};
         var height = window.innerHeight * .8 - margin.left - margin.right;
         var width = window.innerWidth * .95 - margin.top - margin.bottom;
         var numTicks = 3;
     }
     else { // larger device
-        var margin = {top: 30, right: 100, bottom: 50, left: 50};
+        var margin = {top: 30, right: 100, bottom: 70, left: 50};
         var height = window.innerHeight * .5 - margin.top - margin.bottom;
         var width = window.innerWidth * .8 - margin.left - margin.right;
         var numTicks = 8;
@@ -266,6 +266,12 @@ function drawBeeswarm(data) {
         });
 
     cell.append("path").attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+
+    // text label for the x axis
+    svg.append("text")             
+    .attr("transform", "translate(" + ((width - margin.left + margin.right)) + " ," + (height + margin.top - 10) + ")")
+    .style("text-anchor", "end")
+    .text("Miles");
 }
 
 function updateBeeswarm(data) {

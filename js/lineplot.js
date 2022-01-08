@@ -18,13 +18,21 @@ function drawGoalplot(data) {
     //////////////////////////// data prep /////////////////////////
     
     var parseDate = d3.timeParse("%Y-%m-%d");
+    data.forEach(function(d){
+        // parse strings into date object or numbers
+        d.date = parseDate(d.start_date.split("T")[0]);
+    });
+    if (data[data.length - 1].date.setHours(0, 0, 0, 0) != new Date().setHours(0, 0, 0, 0)) {
+        // most recent activity was previous date. Add an activity with 0 distance
+        data.push({
+            date: new Date(),
+            miles: 0,
+        });
+    }
 
     // compute needed vars
     var total_miles = 0;
     data.forEach(function(d){
-
-        // parse strings into date object or numbers
-        d.date = parseDate(d.start_date.split("T")[0]);
 
         // for given date, calc what day it is in the year. 1st day? 50th day? etc.
         var start = new Date(d.date.getFullYear(), 0, 0);
@@ -40,6 +48,8 @@ function drawGoalplot(data) {
         // calc pace column. This is how many miles I should have run to be "on track"
         d.pace = (annual_mileage_goal / 365) * day_of_year;
     });
+
+    console.log(data);
 
     // control how many labels are shown: lower number = more labels. Ex: 2 = label every other day, 10 = every other 10 days
     // label more on larger screen, less on small screen
@@ -62,8 +72,10 @@ function drawGoalplot(data) {
     const maxMileage = d3.max(data, d => d.mileage);
     const maxPace = d3.max(data, d => d.pace);
 
+    var jan01 = new Date(new Date().getFullYear(), 0, 1);
+
     // set the ranges
-    var x = d3.scaleTime().range([0, width]).domain(d3.extent(data, function(d) { return d.date; }));
+    var x = d3.scaleTime().range([0, width]).domain([jan01, new Date()]);
     var y = d3.scaleLinear().range([height, 0]).domain([0,d3.max([maxMileage, maxPace])]);
 
     // add axes
@@ -118,6 +130,7 @@ function drawGoalplot(data) {
         .attr("class", "dot") 
         .attr("cx", function(d) {return x(d.date)})
         .attr("cy", function(d) {return y(d.mileage)})
+        .style("display", function(d) { console.log(d.miles); if (d.miles == 0) { return 'none' } else { return 'block'}})
         .on("mouseover", pointMouseover)
         .on("mouseout", pointMouseout);  
 
@@ -139,10 +152,11 @@ function drawGoalplot(data) {
                 else{ return "" }
             }
             else{
-                // no label needed for Jan 1st, when I didn't run
+                // don't label Jan 1st
                 return "";
             }
         })
+        .style("display", function(d) { console.log(d.miles); if (d.miles == 0) { return 'none' } else { return 'block'}})
         .call(getTextBox);
     
     // draw rectangle on top of text label; called on every text label;
@@ -380,13 +394,21 @@ function updateGoalplot(data) {
     }
 
     var parseDate = d3.timeParse("%Y-%m-%d");
+    data.forEach(function(d){
+        // parse strings into date object or numbers
+        d.date = parseDate(d.start_date.split("T")[0]);
+    });
+    if (data[data.length - 1].date.setHours(0, 0, 0, 0) != new Date().setHours(0, 0, 0, 0)) {
+        // most recent activity was previous date. Add an activity with 0 distance
+        data.push({
+            date: new Date(),
+            miles: 0,
+        });
+    }
 
     // compute needed vars
     var total_miles = 0;
     data.forEach(function(d){
-
-        // parse strings into date object or numbers
-        d.date = parseDate(d.start_date.split("T")[0]);
 
         // for given date, calc what day it is in the year. 1st day? 50th day? etc.
         var start = new Date(d.date.getFullYear(), 0, 0);
@@ -411,8 +433,10 @@ function updateGoalplot(data) {
         var label_freq = Math.floor(data.length / 14) + 1;
     }
 
+    var jan01 = new Date(new Date().getFullYear(), 0, 1);
+
     // update scale functions
-    var x = d3.scaleTime().range([0, width]).domain(d3.extent(data, function(d) { return d.date; }));
+    var x = d3.scaleTime().range([0, width]).domain([jan01, new Date()]);
     var y = d3.scaleLinear().range([height, 0]).domain([0,d3.max([data[data.length-1].mileage, data[data.length-1].pace])]);
 
     // update axes
@@ -493,6 +517,7 @@ function updateGoalplot(data) {
         .attr("class", "dot") 
         .attr("cx", function(d) {return x(d.date)})
         .attr("cy", function(d) {return y(d.mileage)})
+        .style("display", function(d) { console.log(d.miles); if (d.miles == 0) { return 'none' } else { return 'block'}})
         .on("mouseover", pointMouseover)
         .on("mouseout", pointMouseout);  
 
@@ -514,10 +539,11 @@ function updateGoalplot(data) {
                 else{ return "" }
             }
             else{
-                // no label needed for Jan 1st, when I didn't run
+                // don't label Jan 1st
                 return "";
             }
         })
+        .style("display", function(d) { console.log(d.miles); if (d.miles == 0) { return 'none' } else { return 'block'}})
         .call(getTextBox);
 
     function getTextBox(selection) {
