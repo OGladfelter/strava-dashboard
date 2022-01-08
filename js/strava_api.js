@@ -140,6 +140,18 @@ function updateAthleteInfo(data){
     document.getElementById("profile_picture").src = data['profile_medium'];
 }
 
+function heatmapButtons(data) {
+    // event listeners for heatmap
+    document.getElementById("playButton").addEventListener("click", function() {
+        animateHeatmap(data);
+    });
+    document.getElementById("skipButton").addEventListener("click", function() {
+        animateHeatmap(data, 'Y');
+        clearTimeout(timer);
+        enableZoom();
+    });
+}
+
 function renderDashboard(activityData) {
 
     // add tooltip
@@ -176,6 +188,7 @@ function renderDashboard(activityData) {
     animateHeatmap(data, 'Y');
     // center map on start location of their most recent activity
     map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
+    heatmapButtons(data); // add event listeners
 
     const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
     if (activityDataThisYear.length > 1) {
@@ -185,16 +198,6 @@ function renderDashboard(activityData) {
         document.getElementById("goalTracker").style.display = 'none';
     }
 
-    // event listeners for heatmap
-    document.getElementById("playButton").addEventListener("click", function() {
-        animateHeatmap(data);
-    });
-    document.getElementById("skipButton").addEventListener("click", function() {
-        animateHeatmap(data, 'Y');
-        clearTimeout(timer);
-        enableZoom();
-    });
-
     document.getElementById("loader").style.display = 'none';
     document.getElementById("dashboard").style.visibility = 'visible';
 }
@@ -203,15 +206,8 @@ function updateDashboard(data) {
     updateBeeswarm(data);
     updateMileagePlot(data);
     animateHeatmap(data, 'Y');
-    // event listeners for heatmap
-    document.getElementById("playButton").addEventListener("click", function() {
-        animateHeatmap(data);
-    });
-    document.getElementById("skipButton").addEventListener("click", function() {
-        animateHeatmap(data, 'Y');
-        clearTimeout(timer);
-        enableZoom();
-    });
+    // update event listeners for heatmap
+    heatmapButtons(data);
 }
 
 function filterActivityType(input, activity, data) {
