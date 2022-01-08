@@ -184,17 +184,18 @@ function updateMileagePlot(activitiesData) {
         .attr("d", mileageLine); 
 
     //rejoin data
-    var circle = d3.select('#mileageLineplot').select("svg").selectAll("circle").data(data)
-    circle.enter().append("circle").attr("class", "dot");
-    circle.exit().remove(); //remove unneeded circles
-    circle.transition()
-        .duration(2000)
-        .attr("cx",function(d){
-            return x(d.index)
-        })
-        .attr("cy",function(d){
-            return y(d.value)
-        });
+    var circle = d3.select('#mileageLineplot').select("svg").selectAll("circle").remove();
+    // .data(data)
+    // circle.enter().append("circle").attr("class", "dot");
+    // circle.exit().remove(); //remove unneeded circles
+    // circle.transition()
+    //     .duration(2000)
+    //     .attr("cx",function(d){
+    //         return x(d.index)
+    //     })
+    //     .attr("cy",function(d){
+    //         return y(d.value)
+    //     });
 }
 
 function drawBeeswarm(data) {

@@ -149,8 +149,8 @@ function renderDashboard(activityData) {
       .attr('class', 'tooltip')
       .style("pointer-events", "none");
      
+    // data prep
     let data = JSON.parse(JSON.stringify(activityData));
-
     data.forEach(function(d){ 
         d.summary_polyline = d.map.summary_polyline;
     });
@@ -170,8 +170,12 @@ function renderDashboard(activityData) {
         });
     }
 
+    // render some charts
     drawBeeswarm(data);
     mileagePlot(data);
+    animateHeatmap(data, 'Y');
+    // center map on start location of their most recent activity
+    map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
 
     const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
     if (activityDataThisYear.length > 1) {
@@ -181,14 +185,11 @@ function renderDashboard(activityData) {
         document.getElementById("goalTracker").style.display = 'none';
     }
 
-    // center map on start location of their most recent activity
-    map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
+    // event listeners for heatmap
     document.getElementById("playButton").addEventListener("click", function() {
-        d3.select("#heatmap").selectAll('path').remove();
         animateHeatmap(data);
     });
     document.getElementById("skipButton").addEventListener("click", function() {
-        d3.select("#heatmap").selectAll('path').remove();
         animateHeatmap(data, 'Y');
         clearTimeout(timer);
         enableZoom();
@@ -201,6 +202,16 @@ function renderDashboard(activityData) {
 function updateDashboard(data) {
     updateBeeswarm(data);
     updateMileagePlot(data);
+    animateHeatmap(data, 'Y');
+    // event listeners for heatmap
+    document.getElementById("playButton").addEventListener("click", function() {
+        animateHeatmap(data);
+    });
+    document.getElementById("skipButton").addEventListener("click", function() {
+        animateHeatmap(data, 'Y');
+        clearTimeout(timer);
+        enableZoom();
+    });
 }
 
 function filterActivityType(input, activity, data) {
