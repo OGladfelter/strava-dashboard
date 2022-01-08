@@ -155,7 +155,6 @@ function renderDashboard(activityData) {
         d.summary_polyline = d.map.summary_polyline;
     });
     data = data.filter(d => d.summary_polyline); // remove activities without GPS
-    //data = data.filter(d => d.type == 'Kayaking');
     console.log(data);
 
     // create array of all unique activity types in user's data and add each to dropdown filter
@@ -172,7 +171,6 @@ function renderDashboard(activityData) {
     }
 
     drawBeeswarm(data);
-
     mileagePlot(data);
 
     const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
@@ -200,6 +198,11 @@ function renderDashboard(activityData) {
     document.getElementById("dashboard").style.visibility = 'visible';
 }
 
+function updateDashboard(data) {
+    updateBeeswarm(data);
+    updateMileagePlot(data);
+}
+
 function filterActivityType(input, activity, data) {
     if (input.checked) { // if box is checked, add activity from activityTypes
         activityTypes.push(activity);
@@ -221,7 +224,7 @@ function filterActivityType(input, activity, data) {
 
     // filter data and update charts
     data = data.filter(d => activityTypes.includes(d.type));
-    updateBeeswarm(data);
+    updateDashboard(data);
 }
 
 function addFilterOption(activity, data) {
