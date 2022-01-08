@@ -1,11 +1,29 @@
-function groupActivities(data) {
+function fillMissingDates(data) {
     var parseDate = d3.timeParse("%Y-%m-%d");
+    data.forEach(function(d){
+        d.date = parseDate(d.start_date.split("T")[0]); // parse strings into date object
+    });
+
+    // for every day without an activity, create an object to fill in the missing data
+    var missingDates = getDatesBetween(data[0].date, data[data.length-1].date);
+    const dates = [...new Set( data.map(obj => obj.date.getTime())) ];
+    missingDates = missingDates.filter(d => !dates.includes(d.date.getTime()));
+    var completeData = data.concat(missingDates);
+
+    // sort chronologically
+    completeData.sort(function(a,b){
+        return a.date - b.date;
+    });
+    return completeData;
+}
+
+function groupActivities(data) {
 
     const month = new Array();month[0] = "Jan";month[1] = "Feb";month[2] = "Mar";month[3] = "Apr";month[4] = "May";month[5] = "June";month[6] = "July";month[7] = "Aug";month[8] = "Sep";month[9] = "Oct";month[10] = "Nov";month[11] = "Dec";
 
     data.forEach(function(d, i){
         d.mileage = +d.mileage;
-        d.date = parseDate(d.start_date_local.split("T")[0]);
+        // d.date = parseDate(d.start_date_local.split("T")[0]);
         d.year = d.date.getFullYear();
         d.month = month[d.date.getMonth()] + " " + d.year;
     });
@@ -32,9 +50,21 @@ function callTooltip(d, text) {
         .style("top", d3.event.pageY + 10 + "px"); 
 }
 
+const getDatesBetween = (startDate, endDate, includeEndDate) => {
+    const dates = [];
+    const currentDate = startDate;
+    while (currentDate < endDate) {
+        dates.push({'date': new Date(currentDate), 'miles':0});
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+    if (includeEndDate) dates.push({'date':endDate, 'miles':0});
+    return dates;
+};
+
 function mileagePlot(activitiesData) {
 
-    var data = groupActivities(activitiesData);
+    var completeData = fillMissingDates(activitiesData);
+    var data = groupActivities(completeData);
 
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};
@@ -129,7 +159,8 @@ function mileagePlot(activitiesData) {
 
 function updateMileagePlot(activitiesData) {
 
-    var data = groupActivities(activitiesData);
+    var completeData = fillMissingDates(activitiesData);
+    var data = groupActivities(completeData);
 
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};
