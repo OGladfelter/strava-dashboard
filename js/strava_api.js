@@ -195,8 +195,7 @@ function renderDashboard(activityData) {
     heatmapButtons(data); // add event listeners
     // ---
 
-    //const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
-    const activityDataThisYear = data.filter(function(d){ return d.year == "2021" });
+    const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
     if (activityDataThisYear.length > 1) {
         drawGoalplot(activityDataThisYear);
     }
@@ -218,7 +217,7 @@ function updateDashboard(data) {
     enableZoom();
     heatmapButtons(data); // update event listeners for heatmap
 
-    const activityDataThisYear = data.filter(function(d){ return d.year == "2021" });
+    const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
     if (activityDataThisYear.length > 1) {
         document.getElementById("goalTracker").style.display = 'block';
         updateGoalplot(activityDataThisYear);
@@ -285,6 +284,5 @@ function addFilterOption(activity, data) {
 
 // for local development
 d3.json("data.json", function(error, data) {
-    data = data.reverse();
     renderDashboard(data);
 });
