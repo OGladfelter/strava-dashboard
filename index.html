@@ -12,7 +12,7 @@
     </script>
             
     <meta charset="utf-8">
-    <title>Strava Analytics Dashboard</title>
+    <title>Strava Analytics Report</title>
 
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
@@ -118,15 +118,13 @@
     <div class="row" id="goalTracker">
         <h2>Goal tracker: annual mileage</h2>
         <div class="column left">
-            <button id="swapData" style="display:none; width:75%; margin:auto;">Switch to rides</button>
-            <br>
             <div id="sliderDiv" class="sliderDiv">
                 <p style="margin: 0; margin-bottom: 5px;">Mileage Goal: <span id="sliderLabel">1,000</span></p>
-                <input type="range" min="250" max="4000" value="1000" step="50" class="range-slider grad" id="slider">
+                <input type="range" min="100" max="5000" value="1000" step="50" class="range-slider grad" id="slider">
             </div>
         </div>
         <div class="column right">
-            <div id="lineplot" style="margin-top:0px;"></div>
+            <div id="goalplot" style="margin-top:0px;"></div>
         </div>
     </div>
 

@@ -185,14 +185,20 @@ function renderDashboard(activityData) {
     // render some charts
     drawBeeswarm(data);
     mileagePlot(data);
-    animateHeatmap(data, 'Y');
+
+    // heatmap stuff ---
     // center map on start location of their most recent activity
     map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
+    animateHeatmap(data, 'Y');
+    clearTimeout(timer); // this is annoying but for some reason the heatmap doesn't renable zoom if I use the skip option
+    enableZoom();
     heatmapButtons(data); // add event listeners
+    // ---
 
-    const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
+    //const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
+    const activityDataThisYear = data.filter(function(d){ return d.year == "2021" });
     if (activityDataThisYear.length > 1) {
-        lineplot(activityDataThisYear);
+        drawGoalplot(activityDataThisYear);
     }
     else {
         document.getElementById("goalTracker").style.display = 'none';
@@ -205,9 +211,21 @@ function renderDashboard(activityData) {
 function updateDashboard(data) {
     updateBeeswarm(data);
     updateMileagePlot(data);
+    // center map on start location of their most recent activity
+    map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
     animateHeatmap(data, 'Y');
-    // update event listeners for heatmap
-    heatmapButtons(data);
+    clearTimeout(timer); // this is annoying but for some reason the heatmap doesn't renable zoom if I use the skip option
+    enableZoom();
+    heatmapButtons(data); // update event listeners for heatmap
+
+    const activityDataThisYear = data.filter(function(d){ return d.year == "2021" });
+    if (activityDataThisYear.length > 1) {
+        document.getElementById("goalTracker").style.display = 'block';
+        updateGoalplot(activityDataThisYear);
+    }
+    else {
+        document.getElementById("goalTracker").style.display = 'none';
+    }
 }
 
 function filterActivityType(input, activity, data) {
