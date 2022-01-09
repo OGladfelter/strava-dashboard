@@ -238,6 +238,10 @@ function filterActivityType(input, activity, data) {
         }
     }
 
+    if (activityTypes.length == 0) {
+        document.querySelectorAll("#activitiesFilter input[type='checkbox']").forEach(d => { activityTypes.push(d.value); d.checked = true;});
+    }
+
     // rewrite button html
     if (activityTypes.length == "1") {
         document.getElementById("dropdownButton").innerHTML = activityTypes[0].replace(/([A-Z])/g, " $1");
@@ -247,8 +251,9 @@ function filterActivityType(input, activity, data) {
     }
 
     // filter data and update charts
-    data = data.filter(d => activityTypes.includes(d.type));
-    updateDashboard(data);
+    var filteredByActivity = JSON.parse(JSON.stringify(data));
+    filteredByActivity = filteredByActivity.filter(d => activityTypes.includes(d.type));
+    updateDashboard(filteredByActivity);
 }
 
 function addFilterOption(activity, data) {
