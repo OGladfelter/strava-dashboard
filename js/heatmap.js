@@ -21,7 +21,9 @@ map.setMaxBounds([[-90,-180], [90,180]]);
 var zoomExtent = 13, speed = 4, startingColor = 'red', endingColor = '#0e005e';
 
 // read and map data
-function animateHeatmap(data, fastForward = 'N') {
+function animateHeatmap(activitiesData, fastForward = 'N') {
+
+    var data = JSON.parse(JSON.stringify(activitiesData));
 
     // remove lines from previous animation
     d3.select("#heatmap").selectAll("path").remove();

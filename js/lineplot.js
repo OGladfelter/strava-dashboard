@@ -1,4 +1,6 @@
-function drawGoalplot(data) {
+function drawGoalplot(activitiesData) {
+
+    var data = JSON.parse(JSON.stringify(activitiesData));
 
     const annual_mileage_goal = document.getElementById("slider").value; // how many miles I want to run in this year
 
@@ -374,8 +376,10 @@ function drawGoalplot(data) {
     document.getElementById("sliderDiv").style.visibility = "visible";
 }
 
-function updateGoalplot(data) {
+function updateGoalplot(activitiesData) {
         
+    var data = JSON.parse(JSON.stringify(activitiesData));
+
     const annual_mileage_goal = document.getElementById("slider").value; // how many miles I want to run in this year
 
     if (screen.width < 600) { // mobile
