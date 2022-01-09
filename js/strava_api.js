@@ -170,15 +170,23 @@ function renderDashboard(activityData) {
     console.log(data);
 
     // create array of all unique activity types in user's data and add each to dropdown filter
-    activityTypes = d3.map(data, function(d){return d.type;}).keys();
+    var activityCounter = {}
+    data.forEach(d => {
+        if (activityCounter[d.type]) {
+            activityCounter[d.type] += 1;
+        } else { activityCounter[d.type] = 1}
+    })
+    activityTypes = Object.keys(activityCounter);
+    activityTypes.sort(function(a, b) {
+        return activityCounter[b] - activityCounter[a];
+    });
     document.getElementById("dropdownButton").innerHTML = activityTypes.length + " activity types";
     if (activityTypes.length == 1) {
-        // hide filter
-        document.getElementById("activitiesFilter").style.display = "none";
+        document.getElementById("activitiesFilter").style.display = "none"; // hide filter
     }
     else {
         activityTypes.forEach(function(activity) {
-            addFilterOption(activity, data);
+            addFilterOption(activity, data, activityCounter[activity]);
         });
     }
 
@@ -238,6 +246,10 @@ function filterActivityType(input, activity, data) {
         }
     }
 
+    if (activityTypes.length == 0) {
+        document.querySelectorAll("#activitiesFilter input[type='checkbox']").forEach(d => { activityTypes.push(d.value); d.checked = true;});
+    }
+
     // rewrite button html
     if (activityTypes.length == "1") {
         document.getElementById("dropdownButton").innerHTML = activityTypes[0].replace(/([A-Z])/g, " $1");
@@ -247,11 +259,12 @@ function filterActivityType(input, activity, data) {
     }
 
     // filter data and update charts
-    data = data.filter(d => activityTypes.includes(d.type));
-    updateDashboard(data);
+    var filteredByActivity = JSON.parse(JSON.stringify(data));
+    filteredByActivity = filteredByActivity.filter(d => activityTypes.includes(d.type));
+    updateDashboard(filteredByActivity);
 }
 
-function addFilterOption(activity, data) {
+function addFilterOption(activity, data, activityCount) {
     var div = document.getElementById("activityMenu");
     var input = document.createElement("input");
     input.type = "checkbox";
@@ -263,7 +276,7 @@ function addFilterOption(activity, data) {
     var label = document.createElement("label");
     label.for = activity + "Name";
     label.id = activity + "BoxLabel";
-    label.innerHTML = activity.replace(/([A-Z])/g, " $1");
+    label.innerHTML = activity.replace(/([A-Z])/g, " $1") + " <span style='color:gray; font-size:14px; float:right;'>" + activityCount + "</span>";
     label.style.pointerEvents = 'none';
 
     var container = document.createElement("div");
