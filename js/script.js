@@ -63,7 +63,9 @@ const getDatesBetween = (startDate, endDate, includeEndDate) => {
 
 function mileagePlot(activitiesData) {
 
-    var completeData = fillMissingDates(activitiesData);
+    var deepCopy = JSON.parse(JSON.stringify(activitiesData));
+
+    var completeData = fillMissingDates(deepCopy);
     var data = groupActivities(completeData);
 
     if (screen.width < 600) { // mobile
@@ -159,7 +161,9 @@ function mileagePlot(activitiesData) {
 
 function updateMileagePlot(activitiesData) {
 
-    var completeData = fillMissingDates(activitiesData);
+    var deepCopy = JSON.parse(JSON.stringify(activitiesData));
+
+    var completeData = fillMissingDates(deepCopy);
     var data = groupActivities(completeData);
 
     if (screen.width < 600) { // mobile
@@ -229,7 +233,10 @@ function updateMileagePlot(activitiesData) {
     //     });
 }
 
-function drawBeeswarm(data) {
+function drawBeeswarm(activitiesData) {
+
+    var data = JSON.parse(JSON.stringify(activitiesData));
+
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 60, left: 50};
         var height = window.innerHeight * .8 - margin.left - margin.right;
@@ -282,8 +289,9 @@ function drawBeeswarm(data) {
 
     cell.append("circle")
         .attr("class", "bee")
-        .attr("cx", function(d) { return d.data.x; })
-        .attr("cy", function(d) { return d.data.y; })
+        .attr("cx", function(d) { if (d) { return d.data.x; } })
+        .attr("cy", function(d) { if (d) { return d.data.y; } })
+        .style("display", function(d) { if (!d) { return 'none' } })
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
             callTooltip(d, d.data.name + "<br><hr>" + d.data.start_date.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
@@ -296,7 +304,7 @@ function drawBeeswarm(data) {
             window.open(url, '_blank').focus();
         });
 
-    cell.append("path").attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+    cell.append("path").attr("d", function(d) { if (d) { return "M" + d.join("L") + "Z"; }});
 
     // text label for the x axis
     svg.append("text")             
@@ -305,7 +313,10 @@ function drawBeeswarm(data) {
     .text("Miles");
 }
 
-function updateBeeswarm(data) {
+function updateBeeswarm(activitiesData) {
+
+    var data = JSON.parse(JSON.stringify(activitiesData));
+
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};
         var height = window.innerHeight * .8 - margin.left - margin.right;
