@@ -144,10 +144,10 @@ function mileagePlot(activitiesData) {
         .data(allData)
         .enter()
         .append("circle") 
-        .attr("class", "dot") 
+        .attr("class", function(d) {return d.type + " dot"}) 
         .attr("cx", function(d) {return x(d.key)})
         .attr("cy", function(d) {return y(d.value)})
-        .on("mouseover", function(d) { callTooltip(d, new Intl.DateTimeFormat('en-US', { month: 'short'}).format(d.key) + " " + d.key.getFullYear() + "<br>" + d.value.toFixed(1) + " miles") })
+        .on("mouseover", function(d) { callTooltip(d, d.type + "<br>" + new Intl.DateTimeFormat('en-US', { month: 'short'}).format(d.key) + " " + d.key.getFullYear() + "<br>" + d.value.toFixed(1) + " miles") })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
         });  
@@ -189,7 +189,7 @@ function updateMileagePlot(activitiesData) {
 
     // add X axis
     var xAxis = d3.axisBottom(x).ticks(numTicks).tickFormat(d3.timeFormat("%b '%y")).tickSizeOuter(0);
-    d3.select('#mileageLineplot').select("#x_axis").call(xAxis);
+    //d3.select('#mileageLineplot').select("#x_axis").call(xAxis);
     d3.select('#mileageLineplot').select("#y_axis").call(d3.axisLeft(y));
 
    // compute line function
@@ -198,34 +198,21 @@ function updateMileagePlot(activitiesData) {
     .y(function(d) { return y(d.value);  })
     .curve(d3.curveCatmullRom);
 
-//    var colors = ["ffab00", "blue", "cyan", "black", "red", "purple", "silver", "green"];
-
    d3.select('#mileageLineplot').selectAll(".mileage_line").style("visibility", "hidden");
+   d3.select('#mileageLineplot').select("svg").selectAll("circle").style("visibility", "hidden");
 
     // update mileage lines
     activityTypes.forEach((t) => {
-        console.log(t);
         d3.select("#" + t + "mileage_line")
-            .data([datasets[t]]) 
             .style("visibility", "visible")
-            .transition()
-            .duration(2000)
-            .attr("d", mileageLine);
-    });
+            // .data([datasets[t]]) 
+            // .transition()
+            // .duration(2000)
+            // .attr("d", mileageLine);
 
-    //rejoin data
-    var circle = d3.select('#mileageLineplot').select("svg").selectAll("circle").remove();
-    // .data(data)
-    // circle.enter().append("circle").attr("class", "dot");
-    // circle.exit().remove(); //remove unneeded circles
-    // circle.transition()
-    //     .duration(2000)
-    //     .attr("cx",function(d){
-    //         return x(d.index)
-    //     })
-    //     .attr("cy",function(d){
-    //         return y(d.value)
-    //     });
+        d3.selectAll("." + t)
+            .style("visibility", "visible")
+    });
 }
 
 function drawBeeswarm(activitiesData) {

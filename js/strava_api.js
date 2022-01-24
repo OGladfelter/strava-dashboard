@@ -168,7 +168,7 @@ function renderDashboard(activityData) {
     });
     data = data.filter(d => d.summary_polyline); // remove activities without GPS
     console.log(data);
-
+    
     // create array of all unique activity types in user's data and add each to dropdown filter
     var activityCounter = {}
     data.forEach(d => {
@@ -196,6 +196,7 @@ function renderDashboard(activityData) {
         var typeData = this.data.filter(d => d.type == t);
         var completeData = fillMissingDates(typeData);
         var data = groupActivities(completeData); // this function has the error of giving the earliest activity to the latest month?
+        data.forEach(d => d.type = t);
         datasets[t] = data;
     });
 
