@@ -162,13 +162,13 @@ function renderDashboard(activityData) {
       .style("pointer-events", "none");
      
     // data prep
-    let data = JSON.parse(JSON.stringify(activityData));
+    data = JSON.parse(JSON.stringify(activityData));
     data.forEach(function(d){ 
         d.summary_polyline = d.map.summary_polyline;
     });
     data = data.filter(d => d.summary_polyline); // remove activities without GPS
     console.log(data);
-
+    
     // create array of all unique activity types in user's data and add each to dropdown filter
     var activityCounter = {}
     data.forEach(d => {
@@ -190,9 +190,19 @@ function renderDashboard(activityData) {
         });
     }
 
+    // array of array of data separated by activity type
+    datasets = {};
+    activityTypes.forEach(t => { // we need to split all activities into their separately completed and grouped dataset
+        var typeData = this.data.filter(d => d.type == t);
+        var completeData = fillMissingDates(typeData);
+        var data = groupActivities(completeData); // this function has the error of giving the earliest activity to the latest month?
+        data.forEach(d => d.type = t);
+        datasets[t] = data;
+    });
+
     // render some charts
     drawBeeswarm(data);
-    mileagePlot(data);
+    mileagePlot(datasets);
 
     // heatmap stuff ---
     // center map on start location of their most recent activity
@@ -216,8 +226,9 @@ function renderDashboard(activityData) {
 }
 
 function updateDashboard(data) {
+
     updateBeeswarm(data);
-    updateMileagePlot(data);
+    updateMileagePlot(datasets);
     // center map on start location of their most recent activity
     map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
     animateHeatmap(data, 'Y');

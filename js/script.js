@@ -1,3 +1,14 @@
+const getDatesBetween = (startDate, endDate, includeEndDate) => {
+    const dates = [];
+    const currentDate = startDate;
+    while (currentDate < endDate) {
+        dates.push({'date': new Date(currentDate), 'miles':0});
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+    if (includeEndDate) dates.push({'date':endDate, 'miles':0});
+    return dates;
+};
+
 function fillMissingDates(data) {
     var parseDate = d3.timeParse("%Y-%m-%d");
     data.forEach(function(d){
@@ -19,15 +30,11 @@ function fillMissingDates(data) {
 
 function groupActivities(data) {
 
-    const month = new Array();month[0] = "Jan";month[1] = "Feb";month[2] = "Mar";month[3] = "Apr";month[4] = "May";month[5] = "June";month[6] = "July";month[7] = "Aug";month[8] = "Sep";month[9] = "Oct";month[10] = "Nov";month[11] = "Dec";
-
     data.forEach(function(d, i){
         d.mileage = +d.mileage;
-        // d.date = parseDate(d.start_date_local.split("T")[0]);
-        d.year = d.date.getFullYear();
-        d.month = month[d.date.getMonth()] + " " + d.year;
+        d.month = new Date(d.date.getFullYear(), d.date.getMonth(), 1);
     });
-
+    
     return d3.nest().key(function(d){return d.month;}).rollup(function(activities){
         return d3.sum(activities, function(d) {return (d.miles)});
     }).entries(data);
@@ -50,23 +57,7 @@ function callTooltip(d, text) {
         .style("top", d3.event.pageY + 10 + "px"); 
 }
 
-const getDatesBetween = (startDate, endDate, includeEndDate) => {
-    const dates = [];
-    const currentDate = startDate;
-    while (currentDate < endDate) {
-        dates.push({'date': new Date(currentDate), 'miles':0});
-        currentDate.setDate(currentDate.getDate() + 1);
-    }
-    if (includeEndDate) dates.push({'date':endDate, 'miles':0});
-    return dates;
-};
-
 function mileagePlot(activitiesData) {
-
-    var deepCopy = JSON.parse(JSON.stringify(activitiesData));
-
-    var completeData = fillMissingDates(deepCopy);
-    var data = groupActivities(completeData);
 
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};
@@ -82,34 +73,31 @@ function mileagePlot(activitiesData) {
     }
     var padding = 10;
 
-    ////////////// the viz ///////////////
     var svg = d3.select('#mileageLineplot').append("svg")
         .attr("width",  width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    // get max values of mileage and pace columns.
-    // if I'm ahead of pace, my mileage will exceed pace. And vice versa. 
-    // regardless, the higher value should cap the y-axis
-    const maxMileage = d3.max(data, d => d.value);
+    // data prep done already for us
+    var datasets = JSON.parse(JSON.stringify(activitiesData));
 
-    data.forEach(function(d, i) {
-        d.index = i;
+    let maxMileage = 0; // needed for scale
+    activityTypes.forEach(t => {
+        datasets[t].forEach(d => {
+            d.key = new Date(d.key);
+        });
+        maxMileage = Math.max(maxMileage, d3.max(datasets[t], d => d.value));
     });
-
-    // set the ranges
-    var x = d3.scaleLinear().range([padding, width - padding]).domain(d3.extent(data, function(d) { return d.index; }));
+    var allData = Object.values(datasets).flat();
+    
+    // set the ranges - based on dataset with highest mileage, dataset with most months in it
+    var dataXrange = d3.extent(allData, function(d) { return d.key; });
+    var x = d3.scaleTime().range([padding, width - padding]).domain(dataXrange);
     var y = d3.scaleLinear().range([height - padding, padding]).domain([0, maxMileage]);
 
     // add X axis
-    //var xAxis = d3.axisBottom(x).ticks(numTicks).tickFormat(d3.timeFormat("%b '%y"));
-    var xAxis = d3.axisBottom(x).ticks(numTicks).tickSizeOuter(0).tickFormat(function (d) {
-        if (Math.floor(d) != d) {
-            return;
-        }
-		return data[d].key;
-	});
+    var xAxis = d3.axisBottom(x).ticks(numTicks).tickFormat(d3.timeFormat("%b '%y")).tickSizeOuter(0);
     svg.append("g")
             .attr("class", "axis")
             .attr("id", "x_axis")
@@ -135,25 +123,34 @@ function mileagePlot(activitiesData) {
 
     // compute line function
     var mileageLine = d3.line()
-        .x(function(d) { return x(d.index); })
+        .x(function(d) { return x(d.key); })
         .y(function(d) { return y(d.value);  })
         .curve(d3.curveCatmullRom);
+    
+    var c = ["ffab00", "blue", "cyan", "#8C9B4D", "red", "purple", "#CB91FE", "#165539", "#F72E97", "#B692E7", "black", "silver"];
+    var colors = {};
 
-    // draw mileage line
-    svg.append("path")
-        .data([data]) 
-        .attr("class", "mileage_line")  
-        .attr("d", mileageLine); 
+    // draw mileage lines
+    activityTypes.forEach((t, i) => {
+        colors[t] = c[i];
+        svg.append("path")
+            .data([datasets[t]]) 
+            .attr("class", "mileage_line")  
+            .style("stroke", c[i])
+            .attr("d", mileageLine)
+            .attr("id", t + "mileage_line")
+    });
 
-    // draw dots
+    // draw dots for tooltip feature
     svg.selectAll(".dot")
-        .data(data)
+        .data(allData)
         .enter()
         .append("circle") 
-        .attr("class", "dot") 
-        .attr("cx", function(d) {return x(d.index)})
+        .style("fill", function(d) {return colors[d.type]}) 
+        .attr("class", function(d) {return d.type + " dot"}) 
+        .attr("cx", function(d) {return x(d.key)})
         .attr("cy", function(d) {return y(d.value)})
-        .on("mouseover", function(d) { callTooltip(d, d.key + "<br>" + d.value.toFixed(1) + " miles") })
+        .on("mouseover", function(d) { callTooltip(d, d.type + "<br>" + new Intl.DateTimeFormat('en-US', { month: 'short'}).format(d.key) + " " + d.key.getFullYear() + "<br>" + d.value.toFixed(1) + " miles") })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
         });  
@@ -161,10 +158,7 @@ function mileagePlot(activitiesData) {
 
 function updateMileagePlot(activitiesData) {
 
-    var deepCopy = JSON.parse(JSON.stringify(activitiesData));
-
-    var completeData = fillMissingDates(deepCopy);
-    var data = groupActivities(completeData);
+    var datasets = JSON.parse(JSON.stringify(activitiesData));
 
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};
@@ -182,55 +176,46 @@ function updateMileagePlot(activitiesData) {
 
     ////////////// the viz ///////////////
     
-    // get max values of mileage and pace columns.
-    // if I'm ahead of pace, my mileage will exceed pace. And vice versa. 
-    // regardless, the higher value should cap the y-axis
-    const maxMileage = d3.max(data, d => d.value);
-
-    data.forEach(function(d, i) {
-        d.index = i;
+    let maxMileage = 0; // needed for scale
+    activityTypes.forEach(t => {
+        datasets[t].forEach(d => {
+            d.key = new Date(d.key);
+        });
+        maxMileage = Math.max(maxMileage, d3.max(datasets[t], d => d.value));
     });
+    var allData = Object.values(datasets).flat();
 
-    // set the ranges
-    var x = d3.scaleLinear().range([padding, width - padding]).domain(d3.extent(data, function(d) { return d.index; }));
+    // set the ranges - based on dataset with highest mileage, dataset with most months in it
+    var dataXrange = d3.extent(allData, function(d) { return d.key; });
+    var x = d3.scaleTime().range([padding, width - padding]).domain(dataXrange);
     var y = d3.scaleLinear().range([height - padding, padding]).domain([0, maxMileage]);
 
     // add X axis
-    var xAxis = d3.axisBottom(x).ticks(numTicks).tickSizeOuter(0).tickFormat(function (d) {
-        if (Math.floor(d) != d) {
-            return;
-        }
-		return data[d].key;
-	});
-    d3.select('#mileageLineplot').select("#x_axis").call(xAxis);
+    var xAxis = d3.axisBottom(x).ticks(numTicks).tickFormat(d3.timeFormat("%b '%y")).tickSizeOuter(0);
+    //d3.select('#mileageLineplot').select("#x_axis").call(xAxis);
     d3.select('#mileageLineplot').select("#y_axis").call(d3.axisLeft(y));
 
-    // compute line function
-    var mileageLine = d3.line()
-        .x(function(d) { return x(d.index); })
-        .y(function(d) { return y(d.value);  })
-        .curve(d3.curveCatmullRom);
+   // compute line function
+   var mileageLine = d3.line()
+    .x(function(d) { return x(d.key); })
+    .y(function(d) { return y(d.value);  })
+    .curve(d3.curveCatmullRom);
 
-    // draw mileage line
-    d3.select('#mileageLineplot').select(".mileage_line")
-        .data([data]) 
-        .transition()
-        .duration(2000)
-        .attr("d", mileageLine); 
+   d3.select('#mileageLineplot').selectAll(".mileage_line").style("visibility", "hidden");
+   d3.select('#mileageLineplot').select("svg").selectAll("circle").style("visibility", "hidden");
 
-    //rejoin data
-    var circle = d3.select('#mileageLineplot').select("svg").selectAll("circle").remove();
-    // .data(data)
-    // circle.enter().append("circle").attr("class", "dot");
-    // circle.exit().remove(); //remove unneeded circles
-    // circle.transition()
-    //     .duration(2000)
-    //     .attr("cx",function(d){
-    //         return x(d.index)
-    //     })
-    //     .attr("cy",function(d){
-    //         return y(d.value)
-    //     });
+    // update mileage lines
+    activityTypes.forEach((t) => {
+        d3.select("#" + t + "mileage_line")
+            .style("visibility", "visible")
+            // .data([datasets[t]]) 
+            // .transition()
+            // .duration(2000)
+            // .attr("d", mileageLine);
+
+        d3.selectAll("." + t)
+            .style("visibility", "visible")
+    });
 }
 
 function drawBeeswarm(activitiesData) {
