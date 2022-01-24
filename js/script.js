@@ -127,14 +127,16 @@ function mileagePlot(activitiesData) {
         .y(function(d) { return y(d.value);  })
         .curve(d3.curveCatmullRom);
     
-    var colors = ["ffab00", "blue", "cyan", "black", "red", "purple", "silver", "green"];
+    var c = ["ffab00", "blue", "cyan", "#8C9B4D", "red", "purple", "#CB91FE", "#165539", "#F72E97", "#B692E7", "black", "silver"];
+    var colors = {};
 
     // draw mileage lines
     activityTypes.forEach((t, i) => {
+        colors[t] = c[i];
         svg.append("path")
             .data([datasets[t]]) 
             .attr("class", "mileage_line")  
-            .style("stroke", colors[i])
+            .style("stroke", c[i])
             .attr("d", mileageLine)
             .attr("id", t + "mileage_line")
     });
@@ -144,6 +146,7 @@ function mileagePlot(activitiesData) {
         .data(allData)
         .enter()
         .append("circle") 
+        .style("fill", function(d) {return colors[d.type]}) 
         .attr("class", function(d) {return d.type + " dot"}) 
         .attr("cx", function(d) {return x(d.key)})
         .attr("cy", function(d) {return y(d.value)})
