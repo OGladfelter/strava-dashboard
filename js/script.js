@@ -79,18 +79,8 @@ function mileagePlot(activitiesData) {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    // the data prep
-    var deepCopy = JSON.parse(JSON.stringify(activitiesData));
-
-    var datasets = [];
-
-    // we need to split all activities into their separately completed and grouped dataset
-    activityTypes.forEach(t => {
-        var typeData = deepCopy.filter(d => d.type == t);
-        var completeData = fillMissingDates(typeData);
-        var data = groupActivities(completeData); // this function has the error of giving the earliest activity to the latest month?
-        datasets.push(data);
-    });
+    // data prep done already for us
+    var datasets = JSON.parse(JSON.stringify(activitiesData));
 
     let maxMileage = 0; // needed for scale
     datasets.forEach(data => {
@@ -101,7 +91,7 @@ function mileagePlot(activitiesData) {
     });
 
     // set the ranges - based on dataset with highest mileage, dataset with most months in it
-    var dataXrange = d3.extent(datasets[0], function(d) { return d.key; });
+    var dataXrange = d3.extent(datasets.flat(), function(d) { return d.key; });
     var x = d3.scaleTime().range([padding, width - padding]).domain(dataXrange);
     var y = d3.scaleLinear().range([height - padding, padding]).domain([0, maxMileage]);
 
@@ -136,21 +126,20 @@ function mileagePlot(activitiesData) {
         .y(function(d) { return y(d.value);  })
         .curve(d3.curveCatmullRom);
     
-    // draw mileage line
-    svg.append("path")
-        .data([datasets[0]]) 
-        .attr("class", "mileage_line")  
-        .attr("d", mileageLine); 
+    var colors = ["ffab00", "blue", "cyan", "black", "red", "purple", "silver", "green"];
 
-    svg.append("path")
-        .data([datasets[1]]) 
-        .attr("class", "mileage_line")  
-        .style("stroke", "blue")
-        .attr("d", mileageLine); 
+    // draw mileage lines
+    datasets.forEach((data, i) => {
+        svg.append("path")
+            .data([data]) 
+            .attr("class", "mileage_line")  
+            .style("stroke", colors[i])
+            .attr("d", mileageLine); 
+    });
 
-    // draw dots
+    // draw dots for tooltip feature
     svg.selectAll(".dot")
-        .data(datasets[0])
+        .data(datasets.flat())
         .enter()
         .append("circle") 
         .attr("class", "dot") 
@@ -164,10 +153,7 @@ function mileagePlot(activitiesData) {
 
 function updateMileagePlot(activitiesData) {
 
-    var deepCopy = JSON.parse(JSON.stringify(activitiesData));
-
-    var completeData = fillMissingDates(deepCopy);
-    var data = groupActivities(completeData);
+    var datasets = JSON.parse(JSON.stringify(activitiesData));
 
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};
@@ -185,41 +171,49 @@ function updateMileagePlot(activitiesData) {
 
     ////////////// the viz ///////////////
     
-    // get max values of mileage and pace columns.
-    // if I'm ahead of pace, my mileage will exceed pace. And vice versa. 
-    // regardless, the higher value should cap the y-axis
-    const maxMileage = d3.max(data, d => d.value);
-
-    data.forEach(function(d, i) {
-        d.index = i;
+    let maxMileage = 0; // needed for scale
+    datasets.forEach(data => {
+        data.forEach(d => {
+            d.key = new Date(d.key);
+        });
+        maxMileage = Math.max(maxMileage, d3.max(data, d => d.value));
     });
 
-    // set the ranges
-    var x = d3.scaleLinear().range([padding, width - padding]).domain(d3.extent(data, function(d) { return d.index; }));
+    // set the ranges - based on dataset with highest mileage, dataset with most months in it
+    var dataXrange = d3.extent(datasets.flat(), function(d) { return d.key; });
+    console.log(dataXrange);
+    var x = d3.scaleTime().range([padding, width - padding]).domain(dataXrange);
     var y = d3.scaleLinear().range([height - padding, padding]).domain([0, maxMileage]);
 
     // add X axis
-    var xAxis = d3.axisBottom(x).ticks(numTicks).tickSizeOuter(0).tickFormat(function (d) {
-        if (Math.floor(d) != d) {
-            return;
-        }
-		return data[d].key;
-	});
+    var xAxis = d3.axisBottom(x).ticks(numTicks).tickFormat(d3.timeFormat("%b '%y")).tickSizeOuter(0);
     d3.select('#mileageLineplot').select("#x_axis").call(xAxis);
     d3.select('#mileageLineplot').select("#y_axis").call(d3.axisLeft(y));
 
-    // compute line function
-    var mileageLine = d3.line()
-        .x(function(d) { return x(d.index); })
-        .y(function(d) { return y(d.value);  })
-        .curve(d3.curveCatmullRom);
+   // compute line function
+   var mileageLine = d3.line()
+    .x(function(d) { return x(d.key); })
+    .y(function(d) { return y(d.value);  })
+    .curve(d3.curveCatmullRom);
 
-    // draw mileage line
-    d3.select('#mileageLineplot').select(".mileage_line")
-        .data([data]) 
-        .transition()
-        .duration(2000)
-        .attr("d", mileageLine); 
+   var colors = ["ffab00", "blue", "cyan", "black", "red", "purple", "silver", "green"];
+
+    // replace / draw mileage lines
+    d3.select('#mileageLineplot').selectAll(".mileage_line").remove();
+    datasets.forEach((data, i) => {
+        d3.select('#mileageLineplot').select("svg").append("path")
+            .data([data]) 
+            .attr("class", "mileage_line")  
+            .style("stroke", colors[i])
+            .attr("d", mileageLine); 
+    });
+
+    // update  mileage line
+    // d3.select('#mileageLineplot').select(".mileage_line")
+    //     .data([data]) 
+    //     .transition()
+    //     .duration(2000)
+    //     .attr("d", mileageLine); 
 
     //rejoin data
     var circle = d3.select('#mileageLineplot').select("svg").selectAll("circle").remove();
@@ -234,6 +228,20 @@ function updateMileagePlot(activitiesData) {
     //     .attr("cy",function(d){
     //         return y(d.value)
     //     });
+
+
+    // // draw dots for tooltip feature
+    // svg.selectAll(".dot")
+    //     .data(datasets.flat())
+    //     .enter()
+    //     .append("circle") 
+    //     .attr("class", "dot") 
+    //     .attr("cx", function(d) {return x(d.key)})
+    //     .attr("cy", function(d) {return y(d.value)})
+    //     .on("mouseover", function(d) { callTooltip(d, new Intl.DateTimeFormat('en-US', { month: 'short'}).format(d.key) + " " + d.key.getFullYear() + "<br>" + d.value.toFixed(1) + " miles") })
+    //     .on("mouseout", function() {
+    //         tooltip.style("visibility", "hidden");
+    //     });  
 }
 
 function drawBeeswarm(activitiesData) {
