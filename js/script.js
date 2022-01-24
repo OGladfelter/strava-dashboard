@@ -149,17 +149,17 @@ function mileagePlot(activitiesData) {
         .attr("d", mileageLine); 
 
     // draw dots
-    // svg.selectAll(".dot")
-    //     .data(datasets[0])
-    //     .enter()
-    //     .append("circle") 
-    //     .attr("class", "dot") 
-    //     .attr("cx", function(d) {return x(d.index)})
-    //     .attr("cy", function(d) {return y(d.value)})
-    //     .on("mouseover", function(d) { callTooltip(d, d.key + "<br>" + d.value.toFixed(1) + " miles") })
-    //     .on("mouseout", function() {
-    //         tooltip.style("visibility", "hidden");
-    //     });  
+    svg.selectAll(".dot")
+        .data(datasets[0])
+        .enter()
+        .append("circle") 
+        .attr("class", "dot") 
+        .attr("cx", function(d) {return x(d.key)})
+        .attr("cy", function(d) {return y(d.value)})
+        .on("mouseover", function(d) { callTooltip(d, new Intl.DateTimeFormat('en-US', { month: 'short'}).format(d.key) + " " + d.key.getFullYear() + "<br>" + d.value.toFixed(1) + " miles") })
+        .on("mouseout", function() {
+            tooltip.style("visibility", "hidden");
+        });  
 }
 
 function updateMileagePlot(activitiesData) {
