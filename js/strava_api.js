@@ -191,12 +191,12 @@ function renderDashboard(activityData) {
     }
 
     // array of array of data separated by activity type
-    var datasets = [];
+    datasets = {};
     activityTypes.forEach(t => { // we need to split all activities into their separately completed and grouped dataset
         var typeData = this.data.filter(d => d.type == t);
         var completeData = fillMissingDates(typeData);
         var data = groupActivities(completeData); // this function has the error of giving the earliest activity to the latest month?
-        datasets.push(data);
+        datasets[t] = data;
     });
 
     // render some charts
@@ -226,15 +226,6 @@ function renderDashboard(activityData) {
 
 function updateDashboard(data) {
 
-    // array of array of data separated by activity type
-    var datasets = [];
-    activityTypes.forEach(t => { // we need to split all activities into their separately completed and grouped dataset
-        var typeData = this.data.filter(d => d.type == t);
-        var completeData = fillMissingDates(typeData);
-        var data = groupActivities(completeData); // this function has the error of giving the earliest activity to the latest month?
-        datasets.push(data);
-    });
-    
     updateBeeswarm(data);
     updateMileagePlot(datasets);
     // center map on start location of their most recent activity

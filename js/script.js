@@ -83,15 +83,16 @@ function mileagePlot(activitiesData) {
     var datasets = JSON.parse(JSON.stringify(activitiesData));
 
     let maxMileage = 0; // needed for scale
-    datasets.forEach(data => {
-        data.forEach(d => {
+    activityTypes.forEach(t => {
+        datasets[t].forEach(d => {
             d.key = new Date(d.key);
         });
-        maxMileage = Math.max(maxMileage, d3.max(data, d => d.value));
+        maxMileage = Math.max(maxMileage, d3.max(datasets[t], d => d.value));
     });
-
+    var allData = Object.values(datasets).flat();
+    
     // set the ranges - based on dataset with highest mileage, dataset with most months in it
-    var dataXrange = d3.extent(datasets.flat(), function(d) { return d.key; });
+    var dataXrange = d3.extent(allData, function(d) { return d.key; });
     var x = d3.scaleTime().range([padding, width - padding]).domain(dataXrange);
     var y = d3.scaleLinear().range([height - padding, padding]).domain([0, maxMileage]);
 
@@ -129,17 +130,18 @@ function mileagePlot(activitiesData) {
     var colors = ["ffab00", "blue", "cyan", "black", "red", "purple", "silver", "green"];
 
     // draw mileage lines
-    datasets.forEach((data, i) => {
+    activityTypes.forEach((t, i) => {
         svg.append("path")
-            .data([data]) 
+            .data([datasets[t]]) 
             .attr("class", "mileage_line")  
             .style("stroke", colors[i])
-            .attr("d", mileageLine); 
+            .attr("d", mileageLine)
+            .attr("id", t + "mileage_line")
     });
 
     // draw dots for tooltip feature
     svg.selectAll(".dot")
-        .data(datasets.flat())
+        .data(allData)
         .enter()
         .append("circle") 
         .attr("class", "dot") 
@@ -172,16 +174,16 @@ function updateMileagePlot(activitiesData) {
     ////////////// the viz ///////////////
     
     let maxMileage = 0; // needed for scale
-    datasets.forEach(data => {
-        data.forEach(d => {
+    activityTypes.forEach(t => {
+        datasets[t].forEach(d => {
             d.key = new Date(d.key);
         });
-        maxMileage = Math.max(maxMileage, d3.max(data, d => d.value));
+        maxMileage = Math.max(maxMileage, d3.max(datasets[t], d => d.value));
     });
+    var allData = Object.values(datasets).flat();
 
     // set the ranges - based on dataset with highest mileage, dataset with most months in it
-    var dataXrange = d3.extent(datasets.flat(), function(d) { return d.key; });
-    console.log(dataXrange);
+    var dataXrange = d3.extent(allData, function(d) { return d.key; });
     var x = d3.scaleTime().range([padding, width - padding]).domain(dataXrange);
     var y = d3.scaleLinear().range([height - padding, padding]).domain([0, maxMileage]);
 
@@ -196,24 +198,20 @@ function updateMileagePlot(activitiesData) {
     .y(function(d) { return y(d.value);  })
     .curve(d3.curveCatmullRom);
 
-   var colors = ["ffab00", "blue", "cyan", "black", "red", "purple", "silver", "green"];
+//    var colors = ["ffab00", "blue", "cyan", "black", "red", "purple", "silver", "green"];
 
-    // replace / draw mileage lines
-    d3.select('#mileageLineplot').selectAll(".mileage_line").remove();
-    datasets.forEach((data, i) => {
-        d3.select('#mileageLineplot').select("svg").append("path")
-            .data([data]) 
-            .attr("class", "mileage_line")  
-            .style("stroke", colors[i])
-            .attr("d", mileageLine); 
+   d3.select('#mileageLineplot').selectAll(".mileage_line").style("visibility", "hidden");
+
+    // update mileage lines
+    activityTypes.forEach((t) => {
+        console.log(t);
+        d3.select("#" + t + "mileage_line")
+            .data([datasets[t]]) 
+            .style("visibility", "visible")
+            .transition()
+            .duration(2000)
+            .attr("d", mileageLine);
     });
-
-    // update  mileage line
-    // d3.select('#mileageLineplot').select(".mileage_line")
-    //     .data([data]) 
-    //     .transition()
-    //     .duration(2000)
-    //     .attr("d", mileageLine); 
 
     //rejoin data
     var circle = d3.select('#mileageLineplot').select("svg").selectAll("circle").remove();
@@ -228,20 +226,6 @@ function updateMileagePlot(activitiesData) {
     //     .attr("cy",function(d){
     //         return y(d.value)
     //     });
-
-
-    // // draw dots for tooltip feature
-    // svg.selectAll(".dot")
-    //     .data(datasets.flat())
-    //     .enter()
-    //     .append("circle") 
-    //     .attr("class", "dot") 
-    //     .attr("cx", function(d) {return x(d.key)})
-    //     .attr("cy", function(d) {return y(d.value)})
-    //     .on("mouseover", function(d) { callTooltip(d, new Intl.DateTimeFormat('en-US', { month: 'short'}).format(d.key) + " " + d.key.getFullYear() + "<br>" + d.value.toFixed(1) + " miles") })
-    //     .on("mouseout", function() {
-    //         tooltip.style("visibility", "hidden");
-    //     });  
 }
 
 function drawBeeswarm(activitiesData) {
