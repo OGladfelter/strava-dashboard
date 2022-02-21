@@ -167,7 +167,6 @@ function renderDashboard(activityData) {
         d.summary_polyline = d.map.summary_polyline;
     });
     data = data.filter(d => d.summary_polyline); // remove activities without GPS
-    console.log(data);
     
     // create array of all unique activity types in user's data and add each to dropdown filter
     var activityCounter = {}
@@ -230,6 +229,8 @@ function updateDashboard(data) {
 
     updateBeeswarm(data);
     updateMileagePlot(datasets);
+    updateGearPlot(data);
+    
     // center map on start location of their most recent activity
     map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
     animateHeatmap(data, 'Y');
