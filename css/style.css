@@ -281,11 +281,6 @@ circle:hover {
 }
 /*  */
 
-/* gear */
-#gearPlot {
-    display: none;
-}
-
 @media screen and (max-width: 600px) {
     .left {
         width: 100%;
