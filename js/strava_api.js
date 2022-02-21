@@ -203,6 +203,7 @@ function renderDashboard(activityData) {
     // render some charts
     drawBeeswarm(data);
     mileagePlot(datasets);
+    gearPlot(data);
 
     // heatmap stuff ---
     // center map on start location of their most recent activity

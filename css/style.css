@@ -157,6 +157,13 @@ span.bylineSpan{
     r: 5;
     fill-opacity: 0.25;
 }
+.gearDot {
+    stroke: black;
+    stroke-opacity: 0.5;
+    fill: #ffab00;
+    fill-opacity: 0.75;
+    cursor: pointer;
+}
 
 .sliderDiv{
     background-color: #b1ffff;
@@ -273,6 +280,11 @@ circle:hover {
     background-color: #d4dadc;
 }
 /*  */
+
+/* gear */
+#gearPlot {
+    display: none;
+}
 
 @media screen and (max-width: 600px) {
     .left {
