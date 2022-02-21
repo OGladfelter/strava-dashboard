@@ -1000,3 +1000,109 @@ function updateGoalplot(activitiesData) {
         d3.select("#paceEvalText").text(paceEval.toFixed(0) + " miles " + aheadBehind + " goal pace");
     }
 }
+
+function gearPlot(activitiesData) {
+
+    if (screen.width < 600) { // mobile
+        var margin = {top: 20, right: 50, bottom: 50, left: 50};
+        var height = window.innerHeight * .8 - margin.left - margin.right;
+        var width = window.innerWidth * .95 - margin.top - margin.bottom;
+        var numTicks = 3;
+    }
+    else { // larger device
+        var margin = {top: 30, right: 50, bottom: 50, left: 50};
+        var height = window.innerHeight * .8 - margin.top - margin.bottom;
+        var width = window.innerWidth * .9 - margin.left - margin.right;
+        var numTicks = 8;
+    }
+    var padding = 25;
+
+    var svg = d3.select('#gearPlot').append("svg")
+        .attr("width",  width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // data prep done already for us
+    var data = JSON.parse(JSON.stringify(activitiesData));
+    data = data.filter(d => d.type == 'Run');
+    data = data.filter(d => d.gear_id);
+    var parseDate = d3.timeParse("%Y-%m-%d");
+    data.forEach(function(d){
+        // parse strings into date object or numbers
+        d.date = parseDate(d.start_date.split("T")[0]);
+    });
+
+    // set the ranges - x axis is date, y axis is discrete
+    var dateRange = d3.extent(data, function(d) { return d.date; });
+    var hi = d3.map(data, function(d){return d.gear_id;}).keys();
+    console.log(hi);
+    var x = d3.scaleTime().range([padding, width - padding]).domain(dateRange);
+    var y = d3.scalePoint().range([height - padding, padding]).domain(hi);
+
+    var nodes = data.map(function(node, index) {
+        return {
+          x: x(node.date),
+          y: y(node.gear_id),
+          name: node.name,
+          start_date: node.start_date,
+          miles: node.miles,
+          id: node.id
+        };
+      });
+
+    // add X axis
+    var xAxis = d3.axisBottom(x).ticks(numTicks).tickSizeOuter(0);
+    svg.append("g")
+            .attr("class", "axis")
+            .attr("id", "x_axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+    //  Add the Y Axis
+    svg.append("g")
+        .attr("class", "axis")
+        .attr("id", "y_axis")
+        .call(d3.axisLeft(y)
+        .tickSizeOuter(0));
+
+    // y-axis label
+    svg.append("text")
+      .attr("y", 5)
+      .attr("x", 10)
+      .attr("dy", "1em")
+      .style("text-anchor", "start")
+      .style("fill", "#222")
+      .attr("class", "yAxisLabel")
+      .text("Mileage");
+      
+      
+    var simulation = d3.forceSimulation(nodes)
+      .force("collide", d3.forceCollide().radius(2))
+      .stop();
+  
+    for (var i = 0; i < 150; ++i) simulation.tick();
+
+    console.log(nodes);
+
+    // draw dots
+    svg.selectAll(".test")
+        .data(nodes)
+        .enter()
+        .append("circle") 
+        .attr("class", "gearDot")
+        .attr("r", 5)
+        .attr("cx", function(d) {return d.x})
+        .attr("cy", function(d) {return d.y})
+        .on("mouseover", function(d) { 
+            d3.select(this).raise(); 
+            callTooltip(d, d.name + "<br><hr>" + d.start_date.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
+        })
+        .on("mouseout", function() {
+            tooltip.style("visibility", "hidden");
+        })
+        .on("click", function(d) { 
+            var url = "https://www.strava.com/activities/" + d.id;
+            window.open(url, '_blank').focus();
+        });
+}
