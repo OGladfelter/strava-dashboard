@@ -1,28 +1,37 @@
-// world map code
-mapTiles = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
+function drawHeatmap() {
+    // world map code
+    mapTiles = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
         continuousWorld: false,
         noWrap: true
-});
+    });
 
-var map = new L.Map('heatmap', {
-  'center': [40.655239, -73.972084],
-  'zoom': 12,
-  'maxZoom': 14, 
-  'minZoom': 1,
-  'layers': [mapTiles],
-});
-map.setMaxBounds([[-90,-180], [90,180]]);
+    map = new L.Map('heatmap', {
+    'center': [40.655239, -73.972084],
+    'zoom': 12,
+    'maxZoom': 14, 
+    'minZoom': 1,
+    'layers': [mapTiles],
+    });
+    map.setMaxBounds([[-90,-180], [90,180]]);
 
-// map.on('moveend', function() { 
-//     console.log(map.getBounds());
-// });
-//////////
-
-var zoomExtent = 13, speed = 4, startingColor = 'red', endingColor = '#0e005e';
+    // center map on start location of their most recent activity
+    map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
+    animateHeatmap(data, 'Y');
+    clearTimeout(timer); // this is annoying but for some reason the heatmap doesn't renable zoom if I use the skip option
+    enableZoom();
+    heatmapButtons(data); // add event listeners
+    
+    // map.on('moveend', function() { 
+    //     console.log(map.getBounds());
+    // });
+    //////////
+}
 
 // read and map data
 function animateHeatmap(activitiesData, fastForward = 'N') {
 
+    var zoomExtent = 13, speed = 4, startingColor = 'red', endingColor = '#0e005e';
+    
     var data = JSON.parse(JSON.stringify(activitiesData));
 
     // remove lines from previous animation

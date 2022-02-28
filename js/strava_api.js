@@ -204,15 +204,6 @@ function renderDashboard(activityData) {
     mileagePlot(datasets);
     gearPlot(data);
 
-    // heatmap stuff ---
-    // center map on start location of their most recent activity
-    map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
-    animateHeatmap(data, 'Y');
-    clearTimeout(timer); // this is annoying but for some reason the heatmap doesn't renable zoom if I use the skip option
-    enableZoom();
-    heatmapButtons(data); // add event listeners
-    // ---
-
     const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
     if (activityDataThisYear.length > 1) {
         drawGoalplot(activityDataThisYear);
