@@ -195,8 +195,8 @@ function renderDashboard(activityData) {
     datasets = {};
     activityTypes.forEach(t => { // we need to split all activities into their separately completed and grouped dataset
         var typeData = this.data.filter(d => d.type == t);
-        var completeData = fillMissingDates(typeData);
-        var data = groupActivities(completeData); // this function has the error of giving the earliest activity to the latest month?
+        var groupedData = groupActivities(typeData);
+        var data = fillMissingMonths(groupedData);
         data.forEach(d => d.type = t);
         datasets[t] = data;
     });

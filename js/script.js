@@ -38,17 +38,33 @@ const getDatesBetween = (startDate, endDate) => {
     return dates;
 };
 
-function fillMissingDates(data) {
+// function fillMissingDates(data) {
 
-    // for every day without an activity, create an object to fill in the missing data
-    var missingDates = getDatesBetween(data[0].date, data[data.length-1].date);
-    const dates = [...new Set( data.map(obj => obj.date.getTime())) ];
-    missingDates = missingDates.filter(d => !dates.includes(d.date.getTime()));
-    var completeData = data.concat(missingDates);
+//     // for every day without an activity, create an object to fill in the missing data
+//     var missingDates = getDatesBetween(data[0].date, data[data.length-1].date);
+//     const dates = [...new Set( data.map(obj => obj.date.getTime())) ];
+//     missingDates = missingDates.filter(d => !dates.includes(d.date.getTime()));
+//     var completeData = data.concat(missingDates);
 
-    // sort chronologically
-    completeData.sort(function(a,b){
-        return a.date - b.date;
+//     // sort chronologically
+//     completeData.sort(function(a,b){
+//         return a.date - b.date;
+//     });
+//     return completeData;
+// }
+
+function fillMissingMonths(data) {
+    var timestamp = Date.parse(data[0].key); // convert the earliest key, which is a month in string form, to epoch timestamp
+    var date = new Date(timestamp); // convert epoch timestamp into date object
+    var missingMonths = d3.timeMonth.every(1).range(new Date(date.getFullYear(), date.getMonth(), date.getDay()), new Date());
+    var completeData = [];
+    missingMonths.forEach(m => {
+        var match = data.filter(d => d.key == m.toString());
+        let value = 0;
+        if (match.length == 1) {
+            value = match[0].value;
+        }
+        completeData.push({key:m.toString(), value:value})
     });
     return completeData;
 }
