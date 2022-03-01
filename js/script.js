@@ -1060,7 +1060,7 @@ function gearPlot(activitiesData) {
 
     // set the ranges - x axis is date, y axis is discrete
     var dateRange = d3.extent(data, function(d) { return d.date; });
-    var gear_ids = d3.map(data, function(d){return d.gear_id;}).keys();
+    var gear_ids = d3.map(data, function(d){return d.gear_id;});
     var x = d3.scaleTime().range([padding, width - padding]).domain(dateRange);
     var y = d3.scalePoint().range([height - padding, padding]).domain(gear_ids);
 
@@ -1140,7 +1140,7 @@ function updateGearPlot(activitiesData) {
 
     // set the ranges - x axis is date, y axis is discrete
     var dateRange = d3.extent(data, function(d) { return d.date; });
-    var gear_ids = d3.map(data, function(d){return d.gear_id;}).keys();
+    var gear_ids = d3.map(data, function(d){return d.gear_id;});
     var x = d3.scaleTime().range([padding, width - padding]).domain(dateRange);
     var y = d3.scalePoint().range([height - padding, padding]).domain(gear_ids);
 
