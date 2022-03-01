@@ -120,7 +120,7 @@ function getActivities(pageNum){
 
             // some data prep
             strava_data.forEach(function(d){ 
-                d.year = d.start_date.slice(0,4);
+                d.year = d.start_date_local.slice(0,4);
                 d.miles = +d.distance / 1609.34; 
             });
 
@@ -163,8 +163,10 @@ function renderDashboard(activityData) {
      
     // data prep
     data = JSON.parse(JSON.stringify(activityData));
+    var parseDate = d3.timeParse("%Y-%m-%d");
     data.forEach(function(d){ 
         d.summary_polyline = d.map.summary_polyline;
+        d.date = parseDate(d.start_date_local.split("T")[0]);
     });
     data = data.filter(d => d.summary_polyline); // remove activities without GPS
     
@@ -223,11 +225,11 @@ function updateDashboard(data) {
     updateGearPlot(data);
     
     // center map on start location of their most recent activity
-    map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
-    animateHeatmap(data, 'Y');
-    clearTimeout(timer); // this is annoying but for some reason the heatmap doesn't renable zoom if I use the skip option
-    enableZoom();
-    heatmapButtons(data); // update event listeners for heatmap
+    // map.panTo(new L.LatLng(data[data.length-1].start_latitude, data[data.length-1].start_longitude));
+    // animateHeatmap(data, 'Y');
+    // clearTimeout(timer); // this is annoying but for some reason the heatmap doesn't renable zoom if I use the skip option
+    // enableZoom();
+    // heatmapButtons(data); // update event listeners for heatmap
 
     const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
     if (activityDataThisYear.length > 1) {
@@ -263,7 +265,7 @@ function filterActivityType(input, activity, data) {
     }
 
     // filter data and update charts
-    var filteredByActivity = JSON.parse(JSON.stringify(data));
+    var filteredByActivity = [...data].map(i => ({ ...i}));
     filteredByActivity = filteredByActivity.filter(d => activityTypes.includes(d.type));
     updateDashboard(filteredByActivity);
 }

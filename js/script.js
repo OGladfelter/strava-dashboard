@@ -18,32 +18,27 @@ function openTab(evt, tabID) {
     document.getElementById(tabID).style.display = "block";
     evt.currentTarget.className += " active";
 
-    if (tabID == 'heatmapTab') {
-        if (typeof map !== 'undefined') {
-            return;
-        }
-        else {
-            drawHeatmap();
-        }
-    }
+    // if (tabID == 'heatmapTab') {
+    //     if (typeof map !== 'undefined') {
+    //         return;
+    //     }
+    //     else {
+    //         drawHeatmap();
+    //     }
+    // }
 }
 
-const getDatesBetween = (startDate, endDate, includeEndDate) => {
+const getDatesBetween = (startDate, endDate) => {
     const dates = [];
     const currentDate = startDate;
     while (currentDate < endDate) {
         dates.push({'date': new Date(currentDate), 'miles':0});
         currentDate.setDate(currentDate.getDate() + 1);
     }
-    if (includeEndDate) dates.push({'date':endDate, 'miles':0});
     return dates;
 };
 
 function fillMissingDates(data) {
-    var parseDate = d3.timeParse("%Y-%m-%d");
-    data.forEach(function(d){
-        d.date = parseDate(d.start_date.split("T")[0]); // parse strings into date object
-    });
 
     // for every day without an activity, create an object to fill in the missing data
     var missingDates = getDatesBetween(data[0].date, data[data.length-1].date);
@@ -250,7 +245,7 @@ function updateMileagePlot(activitiesData) {
 
 function drawBeeswarm(activitiesData) {
 
-    var data = JSON.parse(JSON.stringify(activitiesData));
+    const data = [...activitiesData].map(i => ({ ...i}));
 
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 60, left: 50};
@@ -309,7 +304,7 @@ function drawBeeswarm(activitiesData) {
         .style("display", function(d) { if (!d) { return 'none' } })
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.data.name + "<br><hr>" + d.data.start_date.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
+            callTooltip(d, d.data.name + "<br><hr>" + d.data.start_date_local.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
@@ -330,7 +325,7 @@ function drawBeeswarm(activitiesData) {
 
 function updateBeeswarm(activitiesData) {
 
-    var data = JSON.parse(JSON.stringify(activitiesData));
+    const data = [...activitiesData].map(i => ({ ...i}));
 
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};
@@ -378,7 +373,7 @@ function updateBeeswarm(activitiesData) {
         .style("display", function(d) { if (!d) { return 'none' } })
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.data.name + "<br><hr>" + d.data.start_date.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
+            callTooltip(d, d.data.name + "<br><hr>" + d.data.start_date_local.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
@@ -393,7 +388,7 @@ function updateBeeswarm(activitiesData) {
 
 function drawGoalplot(activitiesData) {
 
-    var data = JSON.parse(JSON.stringify(activitiesData));
+    const data = [...activitiesData].map(i => ({ ...i}));
 
     const annual_mileage_goal = document.getElementById("slider").value; // how many miles I want to run in this year
 
@@ -411,12 +406,7 @@ function drawGoalplot(activitiesData) {
     }
 
     //////////////////////////// data prep /////////////////////////
-    
-    var parseDate = d3.timeParse("%Y-%m-%d");
-    data.forEach(function(d){
-        // parse strings into date object or numbers
-        d.date = parseDate(d.start_date.split("T")[0]);
-    });
+
     if (data[data.length - 1].date.setHours(0, 0, 0, 0) != new Date().setHours(0, 0, 0, 0)) {
         // most recent activity was previous date. Add an activity with 0 distance
         data.push({
@@ -771,7 +761,7 @@ function drawGoalplot(activitiesData) {
 
 function updateGoalplot(activitiesData) {
         
-    var data = JSON.parse(JSON.stringify(activitiesData));
+    const data = [...activitiesData].map(i => ({ ...i}));
 
     const annual_mileage_goal = document.getElementById("slider").value; // how many miles I want to run in this year
 
@@ -788,11 +778,6 @@ function updateGoalplot(activitiesData) {
         var numTicks = 8;
     }
 
-    var parseDate = d3.timeParse("%Y-%m-%d");
-    data.forEach(function(d){
-        // parse strings into date object or numbers
-        d.date = parseDate(d.start_date.split("T")[0]);
-    });
     if (data[data.length - 1].date.setHours(0, 0, 0, 0) != new Date().setHours(0, 0, 0, 0)) {
         // most recent activity was previous date. Add an activity with 0 distance
         data.push({
@@ -1054,12 +1039,7 @@ function gearPlot(activitiesData) {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // data prep done already for us
-    var data = JSON.parse(JSON.stringify(activitiesData));
-    var parseDate = d3.timeParse("%Y-%m-%d");
-    data.forEach(function(d){
-        // parse strings into date object or numbers
-        d.date = parseDate(d.start_date.split("T")[0]);
-    });
+    const data = [...activitiesData].map(i => ({ ...i}));
 
     // set the ranges - x axis is date, y axis is discrete
     var dateRange = d3.extent(data, function(d) { return d.date; });
@@ -1072,7 +1052,7 @@ function gearPlot(activitiesData) {
           x: x(node.date),
           y: y(node.gear_id),
           name: node.name,
-          start_date: node.start_date,
+          start_date_local: node.start_date_local,
           miles: node.miles,
           id: node.id
         };
@@ -1110,7 +1090,7 @@ function gearPlot(activitiesData) {
         .attr("cy", function(d) {return d.y})
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.name + "<br><hr>" + d.start_date.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
+            callTooltip(d, d.name + "<br><hr>" + d.start_date_local.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
@@ -1139,12 +1119,7 @@ function updateGearPlot(activitiesData) {
 
     var svg = d3.select('#gearPlot').select("svg");
 
-    var data = JSON.parse(JSON.stringify(activitiesData));
-    var parseDate = d3.timeParse("%Y-%m-%d");
-    data.forEach(function(d){
-        // parse strings into date object or numbers
-        d.date = parseDate(d.start_date.split("T")[0]);
-    });
+    const data = [...activitiesData].map(i => ({ ...i}));
 
     // set the ranges - x axis is date, y axis is discrete
     var dateRange = d3.extent(data, function(d) { return d.date; });
@@ -1157,7 +1132,7 @@ function updateGearPlot(activitiesData) {
           x: x(node.date),
           y: y(node.gear_id),
           name: node.name,
-          start_date: node.start_date,
+          start_date_local: node.start_date_local,
           miles: node.miles,
           id: node.id
         };
@@ -1189,7 +1164,7 @@ function updateGearPlot(activitiesData) {
         .attr("cy", function(d) {return d.y})
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.name + "<br><hr>" + d.start_date.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
+            callTooltip(d, d.name + "<br><hr>" + d.start_date_local.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
