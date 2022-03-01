@@ -179,7 +179,7 @@ function mileagePlot(activitiesData) {
             .attr("class", "mileage_line")  
             .style("stroke", c[i])
             .attr("d", mileageLine)
-            .attr("id", t + "mileage_line")
+            .attr("id", t + "mileage_line");
     });
 
     // draw dots for tooltip feature
@@ -189,6 +189,7 @@ function mileagePlot(activitiesData) {
         .append("circle") 
         .style("fill", function(d) {return colors[d.type]}) 
         .attr("class", function(d) {return d.type + " dot"}) 
+        .style("display", function(d) { return d.value == 0 ? 'none' : 'block'})
         .attr("cx", function(d) {return x(d.key)})
         .attr("cy", function(d) {return y(d.value)})
         .on("mouseover", function(d) { callTooltip(d, d.type + "<br>" + new Intl.DateTimeFormat('en-US', { month: 'short'}).format(d.key) + " " + d.key.getFullYear() + "<br>" + d.value.toFixed(1) + " miles") })
