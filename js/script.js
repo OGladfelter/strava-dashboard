@@ -18,42 +18,53 @@ function openTab(evt, tabID) {
     document.getElementById(tabID).style.display = "block";
     evt.currentTarget.className += " active";
 
-    if (tabID == 'heatmapTab') {
-        if (typeof map !== 'undefined') {
-            return;
-        }
-        else {
-            drawHeatmap();
-        }
-    }
+    // if (tabID == 'heatmapTab') {
+    //     if (typeof map !== 'undefined') {
+    //         return;
+    //     }
+    //     else {
+    //         drawHeatmap();
+    //     }
+    // }
 }
 
-const getDatesBetween = (startDate, endDate, includeEndDate) => {
+const getDatesBetween = (startDate, endDate) => {
     const dates = [];
     const currentDate = startDate;
     while (currentDate < endDate) {
         dates.push({'date': new Date(currentDate), 'miles':0});
         currentDate.setDate(currentDate.getDate() + 1);
     }
-    if (includeEndDate) dates.push({'date':endDate, 'miles':0});
     return dates;
 };
 
-function fillMissingDates(data) {
-    var parseDate = d3.timeParse("%Y-%m-%d");
-    data.forEach(function(d){
-        d.date = parseDate(d.start_date.split("T")[0]); // parse strings into date object
-    });
+// function fillMissingDates(data) {
 
-    // for every day without an activity, create an object to fill in the missing data
-    var missingDates = getDatesBetween(data[0].date, data[data.length-1].date);
-    const dates = [...new Set( data.map(obj => obj.date.getTime())) ];
-    missingDates = missingDates.filter(d => !dates.includes(d.date.getTime()));
-    var completeData = data.concat(missingDates);
+//     // for every day without an activity, create an object to fill in the missing data
+//     var missingDates = getDatesBetween(data[0].date, data[data.length-1].date);
+//     const dates = [...new Set( data.map(obj => obj.date.getTime())) ];
+//     missingDates = missingDates.filter(d => !dates.includes(d.date.getTime()));
+//     var completeData = data.concat(missingDates);
 
-    // sort chronologically
-    completeData.sort(function(a,b){
-        return a.date - b.date;
+//     // sort chronologically
+//     completeData.sort(function(a,b){
+//         return a.date - b.date;
+//     });
+//     return completeData;
+// }
+
+function fillMissingMonths(data) {
+    var timestamp = Date.parse(data[0].key); // convert the earliest key, which is a month in string form, to epoch timestamp
+    var date = new Date(timestamp); // convert epoch timestamp into date object
+    var missingMonths = d3.timeMonth.every(1).range(new Date(date.getFullYear(), date.getMonth(), date.getDay()), new Date());
+    var completeData = [];
+    missingMonths.forEach(m => {
+        var match = data.filter(d => d.key == m.toString());
+        let value = 0;
+        if (match.length == 1) {
+            value = match[0].value;
+        }
+        completeData.push({key:m.toString(), value:value})
     });
     return completeData;
 }
@@ -168,7 +179,7 @@ function mileagePlot(activitiesData) {
             .attr("class", "mileage_line")  
             .style("stroke", c[i])
             .attr("d", mileageLine)
-            .attr("id", t + "mileage_line")
+            .attr("id", t + "mileage_line");
     });
 
     // draw dots for tooltip feature
@@ -178,6 +189,7 @@ function mileagePlot(activitiesData) {
         .append("circle") 
         .style("fill", function(d) {return colors[d.type]}) 
         .attr("class", function(d) {return d.type + " dot"}) 
+        .style("display", function(d) { return d.value == 0 ? 'none' : 'block'})
         .attr("cx", function(d) {return x(d.key)})
         .attr("cy", function(d) {return y(d.value)})
         .on("mouseover", function(d) { callTooltip(d, d.type + "<br>" + new Intl.DateTimeFormat('en-US', { month: 'short'}).format(d.key) + " " + d.key.getFullYear() + "<br>" + d.value.toFixed(1) + " miles") })
@@ -250,7 +262,7 @@ function updateMileagePlot(activitiesData) {
 
 function drawBeeswarm(activitiesData) {
 
-    var data = JSON.parse(JSON.stringify(activitiesData));
+    const data = [...activitiesData].map(i => ({ ...i}));
 
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 60, left: 50};
@@ -309,7 +321,7 @@ function drawBeeswarm(activitiesData) {
         .style("display", function(d) { if (!d) { return 'none' } })
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.data.name + "<br><hr>" + d.data.start_date.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
+            callTooltip(d, d.data.name + "<br><hr>" + d.data.start_date_local.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
@@ -330,7 +342,7 @@ function drawBeeswarm(activitiesData) {
 
 function updateBeeswarm(activitiesData) {
 
-    var data = JSON.parse(JSON.stringify(activitiesData));
+    const data = [...activitiesData].map(i => ({ ...i}));
 
     if (screen.width < 600) { // mobile
         var margin = {top: 20, right: 50, bottom: 50, left: 50};
@@ -378,7 +390,7 @@ function updateBeeswarm(activitiesData) {
         .style("display", function(d) { if (!d) { return 'none' } })
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.data.name + "<br><hr>" + d.data.start_date.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
+            callTooltip(d, d.data.name + "<br><hr>" + d.data.start_date_local.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
@@ -393,7 +405,7 @@ function updateBeeswarm(activitiesData) {
 
 function drawGoalplot(activitiesData) {
 
-    var data = JSON.parse(JSON.stringify(activitiesData));
+    const data = [...activitiesData].map(i => ({ ...i}));
 
     const annual_mileage_goal = document.getElementById("slider").value; // how many miles I want to run in this year
 
@@ -411,12 +423,7 @@ function drawGoalplot(activitiesData) {
     }
 
     //////////////////////////// data prep /////////////////////////
-    
-    var parseDate = d3.timeParse("%Y-%m-%d");
-    data.forEach(function(d){
-        // parse strings into date object or numbers
-        d.date = parseDate(d.start_date.split("T")[0]);
-    });
+
     if (data[data.length - 1].date.setHours(0, 0, 0, 0) != new Date().setHours(0, 0, 0, 0)) {
         // most recent activity was previous date. Add an activity with 0 distance
         data.push({
@@ -771,7 +778,7 @@ function drawGoalplot(activitiesData) {
 
 function updateGoalplot(activitiesData) {
         
-    var data = JSON.parse(JSON.stringify(activitiesData));
+    const data = [...activitiesData].map(i => ({ ...i}));
 
     const annual_mileage_goal = document.getElementById("slider").value; // how many miles I want to run in this year
 
@@ -788,11 +795,6 @@ function updateGoalplot(activitiesData) {
         var numTicks = 8;
     }
 
-    var parseDate = d3.timeParse("%Y-%m-%d");
-    data.forEach(function(d){
-        // parse strings into date object or numbers
-        d.date = parseDate(d.start_date.split("T")[0]);
-    });
     if (data[data.length - 1].date.setHours(0, 0, 0, 0) != new Date().setHours(0, 0, 0, 0)) {
         // most recent activity was previous date. Add an activity with 0 distance
         data.push({
@@ -1054,16 +1056,11 @@ function gearPlot(activitiesData) {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // data prep done already for us
-    var data = JSON.parse(JSON.stringify(activitiesData));
-    var parseDate = d3.timeParse("%Y-%m-%d");
-    data.forEach(function(d){
-        // parse strings into date object or numbers
-        d.date = parseDate(d.start_date.split("T")[0]);
-    });
+    const data = [...activitiesData].map(i => ({ ...i}));
 
     // set the ranges - x axis is date, y axis is discrete
     var dateRange = d3.extent(data, function(d) { return d.date; });
-    var gear_ids = d3.map(data, function(d){return d.gear_id;}).keys();
+    var gear_ids = d3.map(data, function(d){return d.gear_id;});
     var x = d3.scaleTime().range([padding, width - padding]).domain(dateRange);
     var y = d3.scalePoint().range([height - padding, padding]).domain(gear_ids);
 
@@ -1072,7 +1069,7 @@ function gearPlot(activitiesData) {
           x: x(node.date),
           y: y(node.gear_id),
           name: node.name,
-          start_date: node.start_date,
+          start_date_local: node.start_date_local,
           miles: node.miles,
           id: node.id
         };
@@ -1110,7 +1107,7 @@ function gearPlot(activitiesData) {
         .attr("cy", function(d) {return d.y})
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.name + "<br><hr>" + d.start_date.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
+            callTooltip(d, d.name + "<br><hr>" + d.start_date_local.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
@@ -1139,16 +1136,11 @@ function updateGearPlot(activitiesData) {
 
     var svg = d3.select('#gearPlot').select("svg");
 
-    var data = JSON.parse(JSON.stringify(activitiesData));
-    var parseDate = d3.timeParse("%Y-%m-%d");
-    data.forEach(function(d){
-        // parse strings into date object or numbers
-        d.date = parseDate(d.start_date.split("T")[0]);
-    });
+    const data = [...activitiesData].map(i => ({ ...i}));
 
     // set the ranges - x axis is date, y axis is discrete
     var dateRange = d3.extent(data, function(d) { return d.date; });
-    var gear_ids = d3.map(data, function(d){return d.gear_id;}).keys();
+    var gear_ids = d3.map(data, function(d){return d.gear_id;});
     var x = d3.scaleTime().range([padding, width - padding]).domain(dateRange);
     var y = d3.scalePoint().range([height - padding, padding]).domain(gear_ids);
 
@@ -1157,7 +1149,7 @@ function updateGearPlot(activitiesData) {
           x: x(node.date),
           y: y(node.gear_id),
           name: node.name,
-          start_date: node.start_date,
+          start_date_local: node.start_date_local,
           miles: node.miles,
           id: node.id
         };
@@ -1189,7 +1181,7 @@ function updateGearPlot(activitiesData) {
         .attr("cy", function(d) {return d.y})
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.name + "<br><hr>" + d.start_date.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
+            callTooltip(d, d.name + "<br><hr>" + d.start_date_local.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
