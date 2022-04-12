@@ -205,6 +205,7 @@ function renderDashboard(activityData) {
     drawBeeswarm(data);
     mileagePlot(datasets);
     gearPlot(data);
+    smallMultiplesSetUp(data);
 
     const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
     if (activityDataThisYear.length > 1) {
