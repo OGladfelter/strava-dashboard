@@ -319,6 +319,7 @@ circle:hover {
 #smallMultiplesTab svg {
     background: whitesmoke;
     margin: 10px;
+    cursor: pointer;
 }
   
 #smallMultiplesTab svg:hover {

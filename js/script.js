@@ -81,7 +81,7 @@ function groupActivities(data) {
     }).entries(data);
 }
 
-function callTooltip(d, text) {
+function callTooltip(text) {
     tooltip
         .style("visibility", "visible")
         .html(text)
@@ -192,7 +192,7 @@ function mileagePlot(activitiesData) {
         .style("display", function(d) { return d.value == 0 ? 'none' : 'block'})
         .attr("cx", function(d) {return x(d.key)})
         .attr("cy", function(d) {return y(d.value)})
-        .on("mouseover", function(d) { callTooltip(d, d.type + "<br>" + new Intl.DateTimeFormat('en-US', { month: 'short'}).format(d.key) + " " + d.key.getFullYear() + "<br>" + d.value.toFixed(1) + " miles") })
+        .on("mouseover", function(d) { callTooltip(d.type + "<br>" + new Intl.DateTimeFormat('en-US', { month: 'short'}).format(d.key) + " " + d.key.getFullYear() + "<br>" + d.value.toFixed(1) + " miles") })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
         });  
@@ -321,7 +321,7 @@ function drawBeeswarm(activitiesData) {
         .style("display", function(d) { if (!d) { return 'none' } })
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.data.name + "<br><hr>" + d.data.start_date_local.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
+            callTooltip(d.data.name + "<br><hr>" + d.data.start_date_local.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
@@ -390,7 +390,7 @@ function updateBeeswarm(activitiesData) {
         .style("display", function(d) { if (!d) { return 'none' } })
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.data.name + "<br><hr>" + d.data.start_date_local.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
+            callTooltip(d.data.name + "<br><hr>" + d.data.start_date_local.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
@@ -1107,7 +1107,7 @@ function gearPlot(activitiesData) {
         .attr("cy", function(d) {return d.y})
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.name + "<br><hr>" + d.start_date_local.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
+            callTooltip(d.name + "<br><hr>" + d.start_date_local.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
@@ -1181,7 +1181,7 @@ function updateGearPlot(activitiesData) {
         .attr("cy", function(d) {return d.y})
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.name + "<br><hr>" + d.start_date_local.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
+            callTooltip(d.name + "<br><hr>" + d.start_date_local.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
@@ -1198,6 +1198,8 @@ function updateGearPlot(activitiesData) {
 function smallMultiplesSetUp(activitiesData) {
     data = activitiesData.filter(function(d) { return d.map.summary_polyline != null });
 
+    console.log(data);
+    
     data.forEach(d => {
         // returns an array of lat, lon pairs
         var path = polyline.decode(d.map.summary_polyline);
@@ -1214,7 +1216,7 @@ function smallMultiplesSetUp(activitiesData) {
         //     lineColor = 'blue';
         // }
 
-        drawSmallMultiples(activityCoordinates, d.name, d.start_date, lineColor);
+        drawSmallMultiples(activityCoordinates, d.name, d.start_date, d.miles, lineColor, d.id);
     });
 
     document.addEventListener("keyup", function(event) {
@@ -1225,7 +1227,7 @@ function smallMultiplesSetUp(activitiesData) {
     });
   }
   
-function drawSmallMultiples(data, name, date, lineColor) {
+function drawSmallMultiples(coordinateData, name, date, miles, lineColor, activityID) {
 
     // set the dimensions and margins of the graph
     var size = 60;
@@ -1235,7 +1237,7 @@ function drawSmallMultiples(data, name, date, lineColor) {
     height = size;
 
     // convert array of coordinates to geojson feature collection
-    var features = data.map(function(d) {
+    var features = coordinateData.map(function(d) {
         return {     
         "type": "Feature",
         "geometry": {
@@ -1256,15 +1258,22 @@ function drawSmallMultiples(data, name, date, lineColor) {
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        .on("click", function(){
-        console.log(name, date);
+        .on("mouseover", function(d) { 
+            callTooltip(name + "<br><hr>" + date.split("T")[0] + "<br>" + miles.toFixed(1) + " miles");
+        })
+        .on("mouseout", function() {
+            tooltip.style("visibility", "hidden");
+        })
+        .on("click", function() { 
+            var url = "https://www.strava.com/activities/" + activityID;
+            window.open(url, '_blank').focus();
         })
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Draw the line
     svg.append("path")
-        .datum(data)
+        .datum(coordinateData)
         .attr("fill", "none")
         .attr("stroke", lineColor)
         .attr("stroke-width", 1)
