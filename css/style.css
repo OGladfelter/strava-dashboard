@@ -316,6 +316,16 @@ circle:hover {
 }
 /*  */
 
+#smallMultiplesTab svg {
+    background: whitesmoke;
+    margin: 10px;
+    cursor: pointer;
+}
+  
+#smallMultiplesTab svg:hover {
+    background: rgba(0, 255, 255, 0.5);
+}
+
 @media screen and (max-width: 600px) {
     .left {
         width: 100%;

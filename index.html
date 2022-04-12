@@ -61,6 +61,7 @@
     <!-- Tab links -->
     <div class="tab">
         <button class="tablinks" onclick="openTab(event, 'homeTab')">Home</button>
+        <button class="tablinks" onclick="openTab(event, 'smallMultiplesTab')">Small Multiples</button>
         <button class="tablinks" onclick="openTab(event, 'heatmapTab')" id='hi'>Animated Heatmap</button>
         <div class="dropdown" id="activitiesFilter">
             <button class="dropbtn" id="dropdownButton"></button>
@@ -69,8 +70,9 @@
     </div> 
 
     <!-- Tab content -->
+    <!-- home tab -->
     <div id="homeTab" class="tabcontent" style="display:block;">
-        <h1 style="margin-top:10vh;">Your Strava Activities In Four Charts</h1>
+        <h1 style="margin-top:10vh;">Your Strava Activities Visualized</h1>
         <span class="bylineSpan">By <a href="https://cultureplot.com/about/" target="_blank">Oliver Gladfelter</a></span><span class="bylineSpan" style="color:gray;"></span>
 
         <div class="intro" id="intro">
@@ -123,6 +125,14 @@
         <!-- end dashboard container -->
     </div>
     
+    <!-- small multiples tab -->
+    <div id="smallMultiplesTab" class="tabcontent">
+        <div id="smallMultiplesContainer" style="text-align:left;"></div>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <button onclick="download()" style="display:none;" id="downloader">Download</button>
+   </div>
+
+   <!-- heatmap tab -->
     <div id="heatmapTab" class="tabcontent">
          <!-- animated heatmap -->
          <div class="row">
@@ -145,6 +155,7 @@
         <!--  -->
     </div>
 
+    <script src="js/polyline.js"></script>
     <script src="js/strava_api.js"></script>
     <script src="js/script.js"></script>
     <script src="js/heatmap.js"></script>

@@ -205,6 +205,7 @@ function renderDashboard(activityData) {
     drawBeeswarm(data);
     mileagePlot(datasets);
     gearPlot(data);
+    smallMultiplesSetUp(data);
 
     const activityDataThisYear = data.filter(function(d){ return d.year == new Date().getFullYear().toString() });
     if (activityDataThisYear.length > 1) {
@@ -239,6 +240,10 @@ function updateDashboard(data) {
     else {
         document.getElementById("goalTracker").style.display = 'none';
     }
+
+    // remove and redraw small multiples
+    d3.select("#smallMultiplesTab").selectAll("svg").remove();
+    smallMultiplesSetUp(data);
 }
 
 function filterActivityType(input, activity, data) {

@@ -81,7 +81,7 @@ function groupActivities(data) {
     }).entries(data);
 }
 
-function callTooltip(d, text) {
+function callTooltip(text) {
     tooltip
         .style("visibility", "visible")
         .html(text)
@@ -192,7 +192,7 @@ function mileagePlot(activitiesData) {
         .style("display", function(d) { return d.value == 0 ? 'none' : 'block'})
         .attr("cx", function(d) {return x(d.key)})
         .attr("cy", function(d) {return y(d.value)})
-        .on("mouseover", function(d) { callTooltip(d, d.type + "<br>" + new Intl.DateTimeFormat('en-US', { month: 'short'}).format(d.key) + " " + d.key.getFullYear() + "<br>" + d.value.toFixed(1) + " miles") })
+        .on("mouseover", function(d) { callTooltip(d.type + "<br>" + new Intl.DateTimeFormat('en-US', { month: 'short'}).format(d.key) + " " + d.key.getFullYear() + "<br>" + d.value.toFixed(1) + " miles") })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
         });  
@@ -321,7 +321,7 @@ function drawBeeswarm(activitiesData) {
         .style("display", function(d) { if (!d) { return 'none' } })
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.data.name + "<br><hr>" + d.data.start_date_local.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
+            callTooltip(d.data.name + "<br><hr>" + d.data.start_date_local.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
@@ -390,7 +390,7 @@ function updateBeeswarm(activitiesData) {
         .style("display", function(d) { if (!d) { return 'none' } })
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.data.name + "<br><hr>" + d.data.start_date_local.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
+            callTooltip(d.data.name + "<br><hr>" + d.data.start_date_local.split("T")[0] + "<br>" + d.data.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
@@ -1107,7 +1107,7 @@ function gearPlot(activitiesData) {
         .attr("cy", function(d) {return d.y})
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.name + "<br><hr>" + d.start_date_local.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
+            callTooltip(d.name + "<br><hr>" + d.start_date_local.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
@@ -1181,7 +1181,7 @@ function updateGearPlot(activitiesData) {
         .attr("cy", function(d) {return d.y})
         .on("mouseover", function(d) { 
             d3.select(this).raise(); 
-            callTooltip(d, d.name + "<br><hr>" + d.start_date_local.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
+            callTooltip(d.name + "<br><hr>" + d.start_date_local.split("T")[0] + "<br>" + d.miles.toFixed(1) + " miles");
         })
         .on("mouseout", function() {
             tooltip.style("visibility", "hidden");
@@ -1194,3 +1194,126 @@ function updateGearPlot(activitiesData) {
     // Exit
     circles.exit().remove();
 }
+
+function smallMultiplesSetUp(activitiesData) {
+    data = activitiesData.filter(function(d) { return d.map.summary_polyline != null });
+
+    console.log(data);
+    
+    data.forEach(d => {
+        // returns an array of lat, lon pairs
+        var path = polyline.decode(d.map.summary_polyline);
+
+        const activityCoordinates = [];
+
+        path.forEach(d => {
+            activityCoordinates.push({lat: d[0], lng: d[1]})
+        });
+
+        var lineColor = 'black';
+        // make activities starting in Chicago a different color
+        // if (d.start_longitude > -87.815606 && d.start_longitude < -87.564981 && d.start_latitude > 41.783071 && 42.010512) {
+        //     lineColor = 'blue';
+        // }
+
+        drawSmallMultiples(activityCoordinates, d.name, d.start_date, d.miles, lineColor, d.id);
+    });
+
+    document.addEventListener("keyup", function(event) {
+        if (event.keyCode === 13) { // 'enter' was pressed
+        svgToCanvas(data.length);
+        document.getElementById("downloader").style.display = 'block';
+        }
+    });
+  }
+  
+function drawSmallMultiples(coordinateData, name, date, miles, lineColor, activityID) {
+
+    // set the dimensions and margins of the graph
+    var size = 60;
+    var m = 5;
+    const margin = {top: m, right: m, bottom: m, left: m},
+    width = size,
+    height = size;
+
+    // convert array of coordinates to geojson feature collection
+    var features = coordinateData.map(function(d) {
+        return {     
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [d.lng, d.lat]
+        }
+        }
+    });
+    var featureCollection = { type:"FeatureCollection", features:features }
+
+    // because we're plotting 3D data (lat, long position on earth) to 2D space, we need a projection
+    var projection = d3.geoMercator()
+    .translate([width / 2,height / 2])
+    .fitSize([width,height], featureCollection);
+
+    // append the svg object to the body of the page
+    const svg = d3.select("#smallMultiplesContainer")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .on("mouseover", function(d) { 
+            callTooltip(name + "<br><hr>" + date.split("T")[0] + "<br>" + miles.toFixed(1) + " miles");
+        })
+        .on("mouseout", function() {
+            tooltip.style("visibility", "hidden");
+        })
+        .on("click", function() { 
+            var url = "https://www.strava.com/activities/" + activityID;
+            window.open(url, '_blank').focus();
+        })
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Draw the line
+    svg.append("path")
+        .datum(coordinateData)
+        .attr("fill", "none")
+        .attr("stroke", lineColor)
+        .attr("stroke-width", 1)
+        .attr("d", d3.line()
+            .x(function(d) { return projection([d.lng,d.lat])[0]; })
+            .y(function(d) { return projection([d.lng,d.lat])[1] })
+        );
+}
+  
+// each activity takes up a space of about 55px (based on plot size of 60px plus 10px margin plus 20px padding)
+// so the # of activities drawn in each row before moving to the next row should be dynamically set based on how many 
+// activities the screen size can comfortably fit (screen width in px / 55px)
+function svgToCanvas(activityCount, activitiesPerRow = Math.floor(window.innerWidth / (60 + 10 + 20))) {
+    activitySize = 60 + 10 + 20;
+    var svgs = document.getElementById('smallMultiplesTab').querySelectorAll('svg');
+    svgs.forEach((svg, i) => {
+        var svgString = new XMLSerializer().serializeToString(svg);
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        ctx.canvas.width  = window.innerWidth;
+        ctx.canvas.height = activityCount / activitiesPerRow * activitySize; // should be # of total activities / # of activities per row * img size
+        var DOMURL = self.URL || self.webkitURL || self;
+        var img = new Image();
+        var svg = new Blob([svgString], {type: "image/svg+xml;charset=utf-8"});
+        var url = DOMURL.createObjectURL(svg);
+        img.onload = function() {
+            var png = canvas.toDataURL("image/png");
+            ctx.drawImage(img, (i % activitiesPerRow) * activitySize, Math.floor(i / activitiesPerRow) * activitySize); // move to a subsequent row when current row hits X activities.
+            document.querySelector('#smallMultiplesContainer').innerHTML = '<img src="'+png+'"/>';
+            DOMURL.revokeObjectURL(png);    
+        };
+        img.src = url;
+    });
+};
+  
+function download() {
+    canvas.toBlob(function (blob) {
+        let link = document.createElement('a');
+        link.download = "GPX_activities_in_small_multiples.png";
+        link.href = URL.createObjectURL(blob);
+        link.click();
+    });
+};
