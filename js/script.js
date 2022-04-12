@@ -1196,9 +1196,7 @@ function updateGearPlot(activitiesData) {
 }
 
 function smallMultiplesSetUp(activitiesData) {
-    console.log(activitiesData);
     data = activitiesData.filter(function(d) { return d.map.summary_polyline != null });
-    //data = data.filter(function(d) { return d.type == "Run" });
 
     data.forEach(d => {
         // returns an array of lat, lon pairs
@@ -1281,7 +1279,7 @@ function drawSmallMultiples(data, name, date, lineColor) {
 // activities the screen size can comfortably fit (screen width in px / 55px)
 function svgToCanvas(activityCount, activitiesPerRow = Math.floor(window.innerWidth / (60 + 10 + 20))) {
     activitySize = 60 + 10 + 20;
-    var svgs = document.querySelectorAll('svg');
+    var svgs = document.getElementById('smallMultiplesTab').querySelectorAll('svg');
     svgs.forEach((svg, i) => {
         var svgString = new XMLSerializer().serializeToString(svg);
         var canvas = document.getElementById("canvas");

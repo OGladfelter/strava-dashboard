@@ -240,6 +240,10 @@ function updateDashboard(data) {
     else {
         document.getElementById("goalTracker").style.display = 'none';
     }
+
+    // remove and redraw small multiples
+    d3.select("#smallMultiplesTab").selectAll("svg").remove();
+    smallMultiplesSetUp(data);
 }
 
 function filterActivityType(input, activity, data) {
