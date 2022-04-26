@@ -1,6 +1,5 @@
 */.ipynb_checkpoints
 .DS_Store
 *.php
-/strava-anomaly-detection
-data.json
+/data
 .vscode

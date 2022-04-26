@@ -5,11 +5,11 @@ strava_data = [];
 var queryString = window.location.search;
 
 // search local storage for a possible access token
-try{
+try {
     var token_exists = JSON.parse(localStorage.getItem("strava_data")).access_token != null;
     var expires_at = JSON.parse(localStorage.getItem("strava_data")).expires_at;
 }
-catch{
+catch {
     var token_exists = false;
     var expires_at = 0;
 }
@@ -34,9 +34,13 @@ else if (token_exists & (new Date().getTime() / 1000) >= expires_at) { // their 
 else if (queryString == "" || queryString == "?state=&error=access_denied"){ // we don't have a code. They still need to log in and authorize
     // encourage them to log in and authorize
     console.log("No token in local storage, no authorization code");
-    //document.getElementById("logInModal").style.display = "block";
+    document.getElementById("logInModal").style.display = "block";
+    // show some mock data loaded underneath log in modal
+    d3.json("data/data.json", function(error, data) {
+        renderDashboard(data);
+    });
 }
-else{ // we have a code because they logged in and authorized. the code can be found in the URL params
+else { // we have a code because they logged in and authorized. the code can be found in the URL params
     console.log("Authorization code retrieved");
 
     var urlParams = new URLSearchParams(queryString);
@@ -98,12 +102,9 @@ function reAuthorize(refreshToken){
     });  
 }
 
-function getActivities(pageNum){
+function getActivities(pageNum) {
     
-    document.getElementById("intro").style.display = 'none';
-    document.getElementById("loader").style.display = 'block';
-
-    console.log(pageNum);
+    document.getElementById("loaderModal").style.display = "block";
 
     const activities_link = `https://www.strava.com/api/v3/activities?per_page=200&access_token=` + token + "&page=" + pageNum;
     fetch(activities_link)
@@ -113,6 +114,7 @@ function getActivities(pageNum){
         // if this page had 200 activities, then there's likely another page
         if (json.length == 200){
             strava_data = strava_data.concat(json); // save contents from this page, run another call to the next page
+            document.getElementById("activityCounter").innerHTML = (200 * pageNum) + ' activities found...';
             getActivities(pageNum + 1); // recursion!!
         }
         else if (json.length < 200){ // we've reached the final page
@@ -128,8 +130,9 @@ function getActivities(pageNum){
             //strava_data = strava_data.sort(function (a,b) {return d3.ascending(a.id, b.id); });
             strava_data = strava_data.reverse(); // reverse data since it came through in reverse-chronoligcal order
 
-            console.log(strava_data);
-
+            //console.log(strava_data);
+            document.getElementById("loaderModal").style.display = "none";
+            document.getElementById("tabContainer").style.display = "block";
             renderDashboard(strava_data);
         }
     })
@@ -154,6 +157,8 @@ function heatmapButtons(data) {
 
 function renderDashboard(activityData) {
 
+    document.getElementById("dashboard").style.visibility = 'visible';
+    
     // add tooltip
     tooltip = d3.select("body")
       .append("div")
@@ -214,9 +219,6 @@ function renderDashboard(activityData) {
     else {
         document.getElementById("goalTracker").style.display = 'none';
     }
-
-    document.getElementById("loader").style.display = 'none';
-    document.getElementById("dashboard").style.visibility = 'visible';
 }
 
 function updateDashboard(data) {
@@ -305,8 +307,3 @@ function addFilterOption(activity, data, activityCount) {
     });
     div.appendChild(container);
 }
-
-// for local development
-d3.json("data.json", function(error, data) {
-    renderDashboard(data);
-});
