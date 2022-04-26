@@ -6,6 +6,60 @@ body {
     margin: 0;
 }
 
+/* The Modal (background) */
+.modal {
+    display: none;
+    position: fixed; /* Stay in place */
+    z-index: 91; /* Sit on top */
+    padding-top: 0px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;
+}
+  
+/* Modal Content */
+.modal-content {
+    position: relative;
+    background-color: whitesmoke;
+    margin: auto;
+    padding: 0;
+    width: 50%;
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 1.5s;
+    animation-name: animatetop;
+    animation-duration: 1.5s;
+    top: 2.5%;
+    padding: 12px;
+}
+
+.modal-body {
+    padding: 2px;
+    width: 80%;
+    margin: auto;
+    text-align: left;
+}
+  
+.stravaButton{
+    width: 30%;
+}
+
+.fakeLink {
+    color: blue;
+    cursor: pointer;
+    font-size: 18px;
+}
+.fakeLink:hover {
+    text-decoration: underline;
+}
+
 /* tab content */
 /* Style the tab */
 .tab {
@@ -15,6 +69,21 @@ body {
     position: fixed;
     width: 100%;
     z-index: 9999;
+    display: none;
+}
+
+.footer {
+    overflow: hidden;
+    background-color: none;
+    width: 100%;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 9999;
+    display: none;
+    text-align: right;
+    display: none;
 }
 
 /* Style the buttons that are used to open the tab content */
@@ -113,11 +182,6 @@ h2 {
     font-size: 30px;
 }
 
-img{
-    padding-left: 10px;
-    padding-top: 10px;
-}
-
 a:link { color: #141DFF; text-decoration: none;}
 a:visited{ color: #141DFF; }
 a:hover {color: black; text-decoration: none;}
@@ -152,11 +216,13 @@ a:hover {color: black; text-decoration: none;}
     color: #0e005e;
 }
 
+.connectButton {
+    width: 15%;
+    cursor: pointer;
+}
+
 p { font-size: 18px;}
 span { font-size: 20px;}
-span.bylineSpan{
-    font-size: 18px;
-}
 
 .mileage_line {
     fill: none;
@@ -269,11 +335,6 @@ span.bylineSpan{
     fill: #8ffcfc;
 }
 
-.intro{
-    width:35%; 
-    margin:auto;
-}
-
 circle:hover {
     fill: #8ffcfc;
 }
@@ -349,10 +410,6 @@ circle:hover {
     }
 
     h1{
-        width: 90%;
-    }
-
-    .intro{
         width: 90%;
     }
 
@@ -459,7 +516,6 @@ iframe{
     height: 60px;
     animation: spin 2s linear infinite;
     margin: auto;
-    display: none;
 }
   
 @keyframes spin {

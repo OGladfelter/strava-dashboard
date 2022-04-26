@@ -1,3 +1,19 @@
+// start with mock data already loaded in background underneath log in modal
+d3.json("data.json", function(error, data) {
+    renderDashboard(data);
+});
+
+function cleanAndSetUp() {
+    document.getElementById("loaderModal").style.display = "block";
+    document.getElementById("tabContainer").style.display = "block";
+}
+
+function demo() {
+    document.getElementById("logInModal").style.display = "none";
+    document.getElementById("tabContainer").style.display = "block";
+    document.getElementById("footer").style.display = "block";
+}
+
 function openTab(evt, tabID) {
     // Declare all variables
     var i, tabcontent, tablinks;

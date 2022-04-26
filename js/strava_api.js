@@ -34,7 +34,7 @@ else if (token_exists & (new Date().getTime() / 1000) >= expires_at) { // their 
 else if (queryString == "" || queryString == "?state=&error=access_denied"){ // we don't have a code. They still need to log in and authorize
     // encourage them to log in and authorize
     console.log("No token in local storage, no authorization code");
-    //document.getElementById("logInModal").style.display = "block";
+    document.getElementById("logInModal").style.display = "block";
 }
 else{ // we have a code because they logged in and authorized. the code can be found in the URL params
     console.log("Authorization code retrieved");
@@ -101,7 +101,6 @@ function reAuthorize(refreshToken){
 function getActivities(pageNum){
     
     document.getElementById("intro").style.display = 'none';
-    document.getElementById("loader").style.display = 'block';
 
     console.log(pageNum);
 
@@ -154,6 +153,8 @@ function heatmapButtons(data) {
 
 function renderDashboard(activityData) {
 
+    document.getElementById("dashboard").style.visibility = 'visible';
+    
     // add tooltip
     tooltip = d3.select("body")
       .append("div")
@@ -214,9 +215,6 @@ function renderDashboard(activityData) {
     else {
         document.getElementById("goalTracker").style.display = 'none';
     }
-
-    document.getElementById("loader").style.display = 'none';
-    document.getElementById("dashboard").style.visibility = 'visible';
 }
 
 function updateDashboard(data) {
@@ -305,8 +303,3 @@ function addFilterOption(activity, data, activityCount) {
     });
     div.appendChild(container);
 }
-
-// for local development
-d3.json("data.json", function(error, data) {
-    renderDashboard(data);
-});
