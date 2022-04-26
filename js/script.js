@@ -1,8 +1,3 @@
-function cleanAndSetUp() {
-    document.getElementById("loaderModal").style.display = "block";
-    document.getElementById("tabContainer").style.display = "block";
-}
-
 function demo() {
     document.getElementById("logInModal").style.display = "none";
     document.getElementById("tabContainer").style.display = "block";
@@ -1208,8 +1203,6 @@ function updateGearPlot(activitiesData) {
 
 function smallMultiplesSetUp(activitiesData) {
     data = activitiesData.filter(function(d) { return d.map.summary_polyline != null });
-
-    console.log(data);
     
     data.forEach(d => {
         // returns an array of lat, lon pairs

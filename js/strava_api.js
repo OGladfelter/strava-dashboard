@@ -36,7 +36,7 @@ else if (queryString == "" || queryString == "?state=&error=access_denied"){ // 
     console.log("No token in local storage, no authorization code");
     document.getElementById("logInModal").style.display = "block";
     // show some mock data loaded underneath log in modal
-    d3.json("data.json", function(error, data) {
+    d3.json("data/data.json", function(error, data) {
         renderDashboard(data);
     });
 }
@@ -132,7 +132,7 @@ function getActivities(pageNum) {
 
             //console.log(strava_data);
             document.getElementById("loaderModal").style.display = "none";
-
+            document.getElementById("tabContainer").style.display = "block";
             renderDashboard(strava_data);
         }
     })
