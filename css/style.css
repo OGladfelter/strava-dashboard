@@ -23,6 +23,7 @@ body {
     -moz-user-select: none;     /* Firefox all */
     -ms-user-select: none;      /* IE 10+ */
     user-select: none;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 }
   
 /* Modal Content */
@@ -38,6 +39,37 @@ body {
     animation-duration: 1.5s;
     top: 2.5%;
     padding: 12px;
+}
+
+.modal-content-2 {
+    position: relative;
+    background-color: transparent;
+    margin: auto;
+    padding: 0;
+    width: 50%;
+    -webkit-animation-name: animatetop2;
+    -webkit-animation-duration: 1.5s;
+    animation-name: animatetop2;
+    animation-duration: 1.5s;
+    top: 10%;
+    padding: 12px;
+}
+
+.modal-content-2 h4 {
+    color: whitesmoke;
+    text-align: center;
+}
+
+.loader {
+    border: 16px solid white; /* Light grey */
+    border-top: 16px solid #ffab00;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 2s linear infinite;
+    margin: auto;
+    display: block;
+    margin-top: 2.5%;
 }
 
 .modal-body {
@@ -505,16 +537,6 @@ iframe{
 
 #chart{
     text-align: center;
-    margin: auto;
-}
-
-.loader {
-    border: 16px solid lightgray; /* Light grey */
-    border-top: 16px solid #0e005e; /* Blue */
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    animation: spin 2s linear infinite;
     margin: auto;
 }
   

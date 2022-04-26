@@ -1,8 +1,3 @@
-// start with mock data already loaded in background underneath log in modal
-d3.json("data.json", function(error, data) {
-    renderDashboard(data);
-});
-
 function cleanAndSetUp() {
     document.getElementById("loaderModal").style.display = "block";
     document.getElementById("tabContainer").style.display = "block";
